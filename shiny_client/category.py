@@ -7,6 +7,7 @@ class CategoryManager:
     def __init__(self):
         """
         """
+        self._page_size = 40
 
     @property
     def resource_url(self):
@@ -25,8 +26,24 @@ class CategoryManager:
         self._api_lang = value
 
     def list(self):
-        r = self._do_request({})
-        cs = r.json()["content"]
+        page_num = total_pages = 1
+
+        while page_num <= total_pages:
+            r = self._get_paged_request(page_num, self._page_size)
+            rj = r.json()
+            cs = rj["content"]
+
+            for c in cs:
+                yield Category(c)
+
+            page_num = rj["page"] + 1
+            total_pages = rj["totalPages"]
+
+    def list_page(self, page_num):
+        r = self._get_paged_request(page_num, self._page_size)
+        rj = r.json()
+        cs = rj["content"]
+
         for c in cs:
             yield Category(c)
 
@@ -36,9 +53,29 @@ class CategoryManager:
         r = requests.get(self._resource_url, **args)
         return r
 
-    def find_by_name(self, name):
-        args = {"params": {"name": name}}
-        r = self._do_request(args)
+    def find_by(self, key_value):
+        """
+        see https://github.com/zalando/shop-api-documentation/wiki/Categories#get-all-categories
+        """
+        filter_params = {"params": key_value}
+        page_num = total_pages = 1
+
+        while page_num <= total_pages:
+            r = self._get_paged_request(page_num, self._page_size, filter_params)
+            rj = r.json()
+            cs = rj["content"]
+
+            for c in cs:
+                yield Category(c)
+
+            page_num = rj["page"] + 1
+            total_pages = rj["totalPages"]
+
+    def _get_paged_request(self, page_num, page_size, args={}):
+        paged_args = {"params": {"pageSize": page_size, "page": page_num}}
+        if args:
+            paged_args.update(args)
+        return self._do_request(paged_args)
 
     def get(self, key):
         """
