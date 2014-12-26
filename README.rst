@@ -27,4 +27,7 @@ in most cases goes for unisex. THe hacker knows the size and... he would like to
 	z-shiny --list-articles --brand-id=evaminge --sale=True
 
 
+Limitations 
+-----------------
 
+TO BE DONE

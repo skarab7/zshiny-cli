@@ -39,6 +39,31 @@ class CategoryManager:
             page_num = rj["page"] + 1
             total_pages = rj["totalPages"]
 
+    def _get_paged_request(self, page_num, page_size, args={}):
+        paged_args = {"params": {"pageSize": page_size, "page": page_num}}
+        if args:
+            paged_args.update(args)
+        return self._do_request(paged_args)
+
+    def _do_request(self, args):
+        return self._do_request_url(self._resource_url, args)
+
+    def _request_raise_for_status(func):
+        def func_wrapper(*args, **kwargs):
+                r = func(*args, **kwargs)
+                if r.status_code == requests.codes.ok:
+                    return r
+                else:
+                    r.raise_for_status()
+        return func_wrapper
+
+    @_request_raise_for_status
+    def _do_request_url(self, url, args={}):
+        if self._api_lang:
+            args["headers"] = {"Accept-Language": self._api_lang}
+        r = requests.get(url, **args)
+        return r
+
     def list_page(self, page_num):
         r = self._get_paged_request(page_num, self._page_size)
         rj = r.json()
@@ -46,12 +71,6 @@ class CategoryManager:
 
         for c in cs:
             yield Category(c)
-
-    def _do_request(self, args):
-        if self._api_lang:
-            args["headers"] = {"Accept-Language": self._api_lang}
-        r = requests.get(self._resource_url, **args)
-        return r
 
     def find_by(self, key_value):
         """
@@ -71,15 +90,13 @@ class CategoryManager:
             page_num = rj["page"] + 1
             total_pages = rj["totalPages"]
 
-    def _get_paged_request(self, page_num, page_size, args={}):
-        paged_args = {"params": {"pageSize": page_size, "page": page_num}}
-        if args:
-            paged_args.update(args)
-        return self._do_request(paged_args)
-
     def get(self, key):
         """
         """
+        url = "{0}/{1}".format(self._resource_url, key)
+        r = self._do_request_url(url)
+        rj = r.json()
+        return Category(rj)
 
     def get_schema(self):
         """

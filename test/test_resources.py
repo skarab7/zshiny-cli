@@ -3,10 +3,12 @@ from shiny_client import client
 from shiny_client import category
 import jsonschema
 import json
+import requests
 
 
 class TestResources(unittest.TestCase):
 
+    # @unittest.skip
     def test_category_manager(self):
         mgmt = self._get_category_mgmt()
 
@@ -23,6 +25,7 @@ class TestResources(unittest.TestCase):
         mgmt.api_lang = "pl-PL"
         return mgmt
 
+    # @unittest.skip
     def test_integration_with_api(self):
         """
         Check whether the CLI creator understands the API.
@@ -45,3 +48,21 @@ class TestResources(unittest.TestCase):
             self.assertTrue(c.outlet)
             self.assertContains(c.name.lower(), "szalik")
             self.assertContains(c.name.lower(), "kominy")
+
+    def test_get_one_category(self):
+        """
+        """
+        mgmt = self._get_category_mgmt()
+        expected_category = next(mgmt.list_page(1))
+        expected_category_key = expected_category.key
+        category = mgmt.get(expected_category_key)
+        self.assertIsNotNone(category)
+        self.assertEquals(expected_category_key, category.key)
+
+    def test_get_not_existing_category(self):
+        """
+        """
+        mgmt = self._get_category_mgmt()
+        not_existing_key = "test-test-test-test"
+        with self.assertRaises(requests.HTTPError):
+            category = mgmt.get(not_existing_key)
