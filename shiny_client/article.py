@@ -15,6 +15,22 @@ class ArticleManager (base.ApiResource, object):
     def search(self, string_query):
         return self.find_by({"fullText": string_query})
 
+    def get_sort_options(self):
+        """
+        The description from:
+        https://github.com/zalando/shop-api-documentation/wiki/Articles#sorting
+        In the next version, the options could be extracted from docs (not very good but handy).
+        Maybe, zalando will provide a REST where you can get all the sorting options.
+        """
+        return {"popularity": "sort by popularity (default)",
+                "activationDate": "sort articles by their activation date",
+                "priceDesc": "expensive articles comes first",
+                "priceAsc": "cheaper articles comes first",
+                "sale":  "articles on sale comes first"}
+
+    def get_sort_param(self):
+        return "sort"
+
     def get_schema(self):
         """
         The properties dsc were

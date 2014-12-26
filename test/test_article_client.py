@@ -13,7 +13,6 @@ class TestArticleClient(unittest.TestCase):
     RESOURCE_URL = "https://api.zalando.com/articles"
     SEARCH_QUERY_STRING = "shoe"
 
-    @unittest.skip
     def test_article_manager(self):
         mgmt = self._get_article_mgmt()
 
@@ -29,7 +28,6 @@ class TestArticleClient(unittest.TestCase):
         mgmt.api_lang = TestArticleClient.API_LANG
         return mgmt
 
-    @unittest.skip
     def test_integration_with_api(self):
         """
         Check whether the CLI creator understands the API.
@@ -43,7 +41,6 @@ class TestArticleClient(unittest.TestCase):
             json_schema = json.loads(js)
             jsonschema.validate(object_as_json, json_schema)
 
-    @unittest.skip
     def test_get_one_object(self):
         """
         """
@@ -54,7 +51,6 @@ class TestArticleClient(unittest.TestCase):
         self.assertIsNotNone(obj)
         self.assertEquals(expected_obj_uuid, obj.get_uuid())
 
-    @unittest.skip
     def test_get_nonexisting(self):
         """
         """
@@ -91,8 +87,21 @@ class TestArticleClient(unittest.TestCase):
         self.assertTrue(True)
         self.assertTrue(query_string.lower() in c_as_string.lower())
 
-    # the sorting should be supported for all search / list / find
-    def test_sort(self):
+    def test_sort_by_price_desc(self):
         """
         """
+        sort_option = "priceDesc"
+        mgmt = self._get_article_mgmt()
+        sort_param = mgmt.get_sort_param()
+        all_options = mgmt.get_sort_options()
+        self.assertTrue(sort_option in all_options)
 
+        prev_value = 0
+
+        is_first_iteration = True
+        for c in mgmt.list_page(2, {"params": {sort_param: sort_option}}):
+            if(is_first_iteration):
+                is_first_iteration = False
+            else:
+                self.assertTrue(prev_value >= c.units[0]['price']['value'])
+            prev_value = c.units[0]['price']['value']

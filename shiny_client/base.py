@@ -33,11 +33,11 @@ class ApiResource:
     def page_size(self, value):
         self._page_size = value
 
-    def list(self):
+    def list(self, params={}):
         page_num = total_pages = 1
 
         while page_num <= total_pages:
-            r = self._get_paged_request(page_num, self._page_size)
+            r = self._get_paged_request(page_num, self._page_size, params)
             rj = r.json()
             cs = rj["content"]
 
@@ -68,7 +68,6 @@ class ApiResource:
                 if r.status_code == requests.codes.ok:
                     return r
                 else:
-                    print(r.url)
                     r.raise_for_status()
         return func_wrapper
 
@@ -79,8 +78,8 @@ class ApiResource:
         r = requests.get(url, **args)
         return r
 
-    def list_page(self, page_num):
-        r = self._get_paged_request(page_num, self._page_size)
+    def list_page(self, page_num, params={}):
+        r = self._get_paged_request(page_num, self._page_size, params)
         rj = r.json()
         cs = rj["content"]
 
@@ -89,18 +88,7 @@ class ApiResource:
 
     def find_by(self, key_value):
         filter_params = {"params": key_value}
-        page_num = total_pages = 1
-
-        while page_num <= total_pages:
-            r = self._get_paged_request(page_num, self._page_size, filter_params)
-            rj = r.json()
-            cs = rj["content"]
-
-            for c in cs:
-                yield self._to_domain_object(c)
-
-            page_num = rj["page"] + 1
-            total_pages = rj["totalPages"]
+        return self.list(filter_params)
 
     def get(self, key):
         """
