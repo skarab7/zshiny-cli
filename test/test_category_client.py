@@ -6,7 +6,7 @@ import json
 import requests
 
 
-class TestResources(unittest.TestCase):
+class TestCategoryClient(unittest.TestCase):
 
     # @unittest.skip
     def test_category_manager(self):
