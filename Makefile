@@ -15,5 +15,5 @@ _virtualenv_install_packages:
 test:
 	python setup.py test
 
-nosetest_nc:
+nosetest_nc_all:
 	nosetests --nocapture ;

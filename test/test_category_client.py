@@ -4,9 +4,13 @@ from shiny_client import category
 import jsonschema
 import json
 import requests
+import os
 
 
 class TestCategoryClient(unittest.TestCase):
+
+    API_LANG = os.getenv("SHINY_CLIENT_TEST_API_LANG", "pl-PL")
+    RESOURCE_URL = "https://api.zalando.com/categories"
 
     # @unittest.skip
     def test_category_manager(self):
@@ -21,8 +25,8 @@ class TestCategoryClient(unittest.TestCase):
 
     def _get_category_mgmt(self):
         mgmt = category.CategoryManager()
-        mgmt.resource_url = "http://api.zalando.com:80/categories"
-        mgmt.api_lang = "pl-PL"
+        mgmt.resource_url = TestCategoryClient.RESOURCE_URL
+        mgmt.api_lang = TestCategoryClient.API_LANG
         return mgmt
 
     # @unittest.skip
