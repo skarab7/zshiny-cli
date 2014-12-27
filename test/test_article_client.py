@@ -1,7 +1,7 @@
 import unittest
 from shiny_client import article
 import requests
-from base_test import ApiResourceTest, SimpleApiResourceTest
+from base_test import ApiResourceTest
 
 
 class TestArticleClient(ApiResourceTest, unittest.TestCase):
