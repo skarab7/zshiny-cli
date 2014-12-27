@@ -48,9 +48,12 @@ class SimpleApiResource(BaseApiResource):
         """
         """
         r = self._do_request_url(self._resource_url)
-        cs = r.json()
+        cs = self._get_object_array_json(r)
         for c in cs:
             yield self._to_domain_object(c)
+
+    def _get_object_array_json(self, r):
+        return r.json()
 
 
 class ApiResource(BaseApiResource):
@@ -113,6 +116,9 @@ class ApiResource(BaseApiResource):
         url = "{0}/{1}".format(self._resource_url, key)
         r = self._do_request_url(url)
         return self._to_domain_object(r.json())
+
+    def _get_object_array_json(self, r):
+        return r.json()["content"]
 
 
 class ApiObject:

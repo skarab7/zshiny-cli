@@ -14,7 +14,7 @@ class FilterManager(base.SimpleApiResource):
         return """
 {
     "$$schema": "http://json-schema.org/draft-04/schema#",
-    "title" : "Article",
+    "title" : "Filter",
     "type" : "object",
 
     "properties" : {

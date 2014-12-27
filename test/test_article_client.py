@@ -1,63 +1,25 @@
 import unittest
-from shiny_client import client
 from shiny_client import article
-import jsonschema
-import json
 import requests
-import os
+from base_test import ApiResourceTest
 
 
-class TestArticleClient(unittest.TestCase):
+class TestArticleClient(ApiResourceTest, unittest.TestCase):
 
-    API_LANG = os.getenv("SHINY_CLIENT_TEST_API_LANG", "pl-PL")
     RESOURCE_URL = "https://api.zalando.com/articles"
     SEARCH_QUERY_STRING = "shoe"
 
-    def test_article_manager(self):
-        mgmt = self._get_article_mgmt()
+    def _assert_resouce_list_test(self, o):
+        self.assertIsNotNone(o.name)
+        self.assertIsNotNone(o.get_uuid())
+        self.assertIsNotNone(o.id)
+        self.assertEquals(o.get_uuid(), o.id)
 
-        for c in mgmt.list_page(2):
-            self.assertIsNotNone(c.name)
-            self.assertIsNotNone(c.get_uuid())
-            self.assertIsNotNone(c.id)
-            self.assertEquals(c.get_uuid(), c.id)
+    def _create_resource_mgmt(self):
+        return article.ArticleManager()
 
-    def _get_article_mgmt(self):
-        mgmt = article.ArticleManager()
-        mgmt.resource_url = TestArticleClient.RESOURCE_URL
-        mgmt.api_lang = TestArticleClient.API_LANG
-        return mgmt
-
-    def test_integration_with_api(self):
-        """
-        Check whether the CLI creator understands the API.
-        Test against the changes in schema.
-        """
-        mgmt = self._get_article_mgmt()
-        r = mgmt._do_request({})
-        for i in range(10):
-            object_as_json = r.json()["content"][i]
-            js = mgmt.get_schema()
-            json_schema = json.loads(js)
-            jsonschema.validate(object_as_json, json_schema)
-
-    def test_get_one_object(self):
-        """
-        """
-        mgmt = self._get_article_mgmt()
-        expected_obj = next(mgmt.list_page(1))
-        expected_obj_uuid = expected_obj.get_uuid()
-        obj = mgmt.get(expected_obj_uuid)
-        self.assertIsNotNone(obj)
-        self.assertEquals(expected_obj_uuid, obj.get_uuid())
-
-    def test_get_nonexisting(self):
-        """
-        """
-        mgmt = self._get_article_mgmt()
-        not_existing_key = "test-test-test-test"
-        with self.assertRaises(requests.HTTPError):
-            category = mgmt.get(not_existing_key)
+    def _get_resource_endpoint(self):
+        return TestArticleClient.RESOURCE_URL
 
     def test_find_by_filtering_attributes(self):
         """
@@ -65,7 +27,7 @@ class TestArticleClient(unittest.TestCase):
 
         https://api.zalando.com/filters
         """
-        mgmt = self._get_article_mgmt()
+        mgmt = self._get_resource_mgmt()
         query_value = "female"
         query = {"gender": query_value}
 
@@ -77,7 +39,7 @@ class TestArticleClient(unittest.TestCase):
     def test_fulltext_search(self):
         """
         """
-        mgmt = self._get_article_mgmt()
+        mgmt = self._get_resource_mgmt()
         query_string = TestArticleClient.SEARCH_QUERY_STRING
         c = next(mgmt.search(query_string))
         # TODO: consider redesign of this code fragment
@@ -91,7 +53,7 @@ class TestArticleClient(unittest.TestCase):
         """
         """
         sort_option = "priceDesc"
-        mgmt = self._get_article_mgmt()
+        mgmt = self._get_resource_mgmt()
         sort_param = mgmt.get_sort_param()
         all_options = mgmt.get_sort_options()
         self.assertTrue(sort_option in all_options)

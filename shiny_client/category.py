@@ -73,3 +73,5 @@ class CategoryManager(base.ApiResource, object):
 class Category(base.ApiObject, object):
     """
     """
+    def get_uuid(self):
+        return self.key
