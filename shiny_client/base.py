@@ -1,14 +1,9 @@
 import requests
 
 
-class ApiResource:
+class BaseApiResource:
     """
-    A mix-in requires from the base
-    class to implement *_to_domain_object*.
     """
-    PARAMETER_PAGE_SIZE = "size"
-    PARAMETER_PAGE_NUMBER = "page"
-
     @property
     def resource_url(self):
         return self._resource_url
@@ -24,6 +19,44 @@ class ApiResource:
     @api_lang.setter
     def api_lang(self, value):
         self._api_lang = value
+
+    def _request_raise_for_status(func):
+        def func_wrapper(*args, **kwargs):
+                r = func(*args, **kwargs)
+                if r.status_code == requests.codes.ok:
+                    return r
+                else:
+                    r.raise_for_status()
+        return func_wrapper
+
+    @_request_raise_for_status
+    def _do_request_url(self, url, args={}):
+        if self._api_lang:
+            args["headers"] = {"Accept-Language": self._api_lang}
+        r = requests.get(url, **args)
+        return r
+
+
+class SimpleApiResource(BaseApiResource):
+    """
+    """
+
+    def list(self):
+        """
+        """
+        r = self._do_request_url(self._resource_url)
+        cs = r.json()
+        for c in cs:
+            yield self._to_domain_object(c)
+
+
+class ApiResource(BaseApiResource):
+    """
+    A mix-in requires from the base
+    class to implement *_to_domain_object*.
+    """
+    PARAMETER_PAGE_SIZE = "size"
+    PARAMETER_PAGE_NUMBER = "page"
 
     @property
     def page_size(self):
@@ -61,22 +94,6 @@ class ApiResource:
 
     def _do_request(self, args):
         return self._do_request_url(self._resource_url, args)
-
-    def _request_raise_for_status(func):
-        def func_wrapper(*args, **kwargs):
-                r = func(*args, **kwargs)
-                if r.status_code == requests.codes.ok:
-                    return r
-                else:
-                    r.raise_for_status()
-        return func_wrapper
-
-    @_request_raise_for_status
-    def _do_request_url(self, url, args={}):
-        if self._api_lang:
-            args["headers"] = {"Accept-Language": self._api_lang}
-        r = requests.get(url, **args)
-        return r
 
     def list_page(self, page_num, params={}):
         r = self._get_paged_request(page_num, self._page_size, params)
