@@ -50,3 +50,5 @@ class BrandManager (base.ApiResource, object):
 class Brand(base.ApiObject, object):
     """
     """
+    def get_uuid(self):
+        return self.key
