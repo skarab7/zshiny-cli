@@ -20,6 +20,9 @@ class BaseApiResource:
     def api_lang(self, value):
         self._api_lang = value
 
+    def _do_request(self, args):
+        return self._do_request_url(self._resource_url, args)
+
     def _request_raise_for_status(func):
         def func_wrapper(*args, **kwargs):
                 r = func(*args, **kwargs)
@@ -91,9 +94,6 @@ class ApiResource(BaseApiResource):
         result["params"][ApiResource.PARAMETER_PAGE_SIZE] = page_size
         result["params"][ApiResource.PARAMETER_PAGE_NUMBER] = page_num
         return result
-
-    def _do_request(self, args):
-        return self._do_request_url(self._resource_url, args)
 
     def list_page(self, page_num, params={}):
         r = self._get_paged_request(page_num, self._page_size, params)
