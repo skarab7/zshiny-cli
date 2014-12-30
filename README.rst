@@ -10,11 +10,11 @@ in most cases goes for unisex. THe hacker knows the size and... he would like to
 :: 
 
 
-	# show me all brands (example with the only PL mark I know ;) )
-	z-shiny --list-brands | grep evaminge 
+	# show me all brands (example with the only polish brand I know ;) )
+	zshiny --list-brands | grep evaminge 
 
-	z-shiny --get-brand --brand-id=ev2
-	z-shiny --get-brand --brand-name=evaminge
+	zshiny --get-brand --brand-id=ev2
+	zshiny --get-brand --brand-name=evaminge
 
 	export MY_BRAND_ID=$(z-shiny --list-brands | grep evaminge)
 
@@ -22,12 +22,13 @@ in most cases goes for unisex. THe hacker knows the size and... he would like to
 	# next we check whether name contains it, 
 	# e.g.,
 	#    "name" : "NEW B-MUSSILA - Summer jacket - black",
-	z-shiny --list-articles --type=shoes
+	zshiny --list-articles --type=shoes
 
-	z-shiny --list-articles --brand-id=evaminge --sale=True
+	zshiny --list-articles --brand-id=evaminge --sale=True
 
 
 Limitations 
 -----------------
 
-TO BE DONE
+- only python3
+

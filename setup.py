@@ -10,7 +10,7 @@ except ImportError:
     from distutils.core import setup
 
 config = {
-    'description': 'Zalando CLI that works on Zalando API',
+    'description': 'Unofficial CLI for Zalando REST API',
     'license': 'Apache 2',
     'long_description': read('README.rst')
     'author': 'Wojciech Barczynski',
