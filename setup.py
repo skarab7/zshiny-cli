@@ -10,8 +10,14 @@ config = {
     'download_url': '',
     'author_email': 'wpjtek@yahoo.com',
     'version': '0.1',
-    'install_requires': ['click', 'request'],
+    'install_requires': ['requests', 'argparse', 'simplejson'],
     'scripts': [],
-    'name': 'projectname'
+    'packages': ['shiny_client'],
+    'name': 'shiny_client',
+    'entry_points': {
+        'console_scripts': [
+            'zshiny = shiny_client.client:main'
+        ]
+    }
 }
 setup(**config)
