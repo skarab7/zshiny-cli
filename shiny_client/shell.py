@@ -16,10 +16,26 @@ class Cli(object):
         self.parser = argparse.ArgumentParser(description='')
         self.clients = dict()
 
-    def add_commands(self, resource_clients):
+    def add_enabled_commands(self, resource_clients):
+        self._discover_enabled_commands(resource_clients)
+        self._add_commands_parser_args()
+
+    def _discover_enabled_commands(self, resource_clients):
         for cls in resource_clients:
             cmd = cls()
             self.clients[cmd.command_name] = cmd
+
+    def _add_commands_parser_args(self):
+
+        subparsers = self.parser.add_subparsers(dest='subparser_name')
+
+        for k, c in self.clients.items():
+            cn = c.command_name
+            ch = c.help_info
+            subp = subparsers.add_parser(cn, help=ch)
+            c.add_parser_args(parser=subp)
+            self._add_connection_args(subp)
+            self._add_output_options_args(subp)
 
     """
     Notes: remember about bash-completion
@@ -52,84 +68,46 @@ class Cli(object):
                                dest="is_machine_readable", help="NOT_IMPLEMENTED")
         subparser.add_argument('--fields', action='store', dest="output_fields",
                                help="NOT_IMPLEMENTED", default=None)
-        # for the bash lovers, machine readable output
-        # self.parser.
-
-    def add_command_parser(self):
-
-        subparsers = self.parser.add_subparsers(dest='subparser_name')
-
-        for k, c in self.clients.items():
-            cn = c.command_name
-            ch = c.help_info
-            subp = subparsers.add_parser(cn, help=ch)
-            c.add_parser_args(parser=subp)
-            self._add_connection_args(subp)
-            self._add_output_options_args(subp)
 
     def parse_args(self):
         """
         Parse arguments
         """
-        return self.parser.parse_args()
+        self._args = self.parser.parse_args()
 
-    def get_resource_catalog(self, args):
-        rm = create_resource_mgmt(ResourceEndpointManager, args.endpoint,
-                                  args.lang, args.is_insecure, args.is_debug_enabled)
-        result = list(rm.list())[0]
-        return result
+    def get_parsed_args(self):
+        return self._args
 
-    def execute_command(self, args, resource_catalog):
-        cmd = self.clients[args.subparser_name]
-        cmd.lang = args.lang
-        cmd.endpoint = self.get_resource_url(cmd, resource_catalog)
+    def execute_command(self, resource_catalog):
+        cmd = self.clients[self._args.subparser_name]
+        cmd.lang = self._args.lang
+        cmd.endpoint = get_resource_url(cmd, resource_catalog)
         cmd.is_insecure = False
-        cmd.perform(args)
-
-    def get_resource_url(self, cmd, resource_catalog):
-        result = resource_catalog.find_resource_url(cmd.resource_name)
-        return result
-
-        # """
-        # brand-list
-        # brand-show
-        # article-list
-        # article-show
-        # ategory-list
-        # category-show
-        # """
-        # artifacts = ["brand", "article", "category"]
-        # cmds = {"list": "store_true", "show": "store"}
-        # for art in artifacts:
-        #    for action, store in cmds.items():
-        #        cmd = "{0}-{1}".format(art, action)
-        #        help = ("{0}-{1}".format(art, action)).title()
-        #
-        #        subp.add_argument(cmd, action=store)
-    # def add_known_cmd_options_parser(self):
-    #    # filds separated by |
-    #    # so you can customize the output
-    #    self.parser.add_argument('--fields',
-    #                             dest="fields")
-
-    # def get_unknown_args_parser(self):
-    #    """
-    #    The client should be level3, so we should get as much as possible information
-    #    from the http endpoint to make the CLI survive small API changes.
-    #    We should use hypermedia.
-    #    http://martinfowler.com/articles/richardsonMaturityModel.html
-    #
-    #    The unknown should be prefixed by 'by-'
-    #    """
+        if self._args.output_fields:
+            cmd.fields = self._args.output_fields
+        cmd.perform(self._args)
 
 
-if __name__ == "__main__":
+def get_resource_url(cmd, resource_catalog):
+    result = resource_catalog.find_resource_url(cmd.resource_name)
+    return result
+
+
+def get_resource_catalog(args):
+    rm = create_resource_mgmt(ResourceEndpointManager, args.endpoint,
+                              args.lang, args.is_insecure, args.is_debug_enabled)
+    result = list(rm.list())[0]
+    return result
+
+
+def main():
     """
     """
     cli = Cli()
-    cli.add_commands(clients.enabled_commands)
-    cli.add_command_parser()
-#    cli.add_known_cmd_options_parser()
-    args = cli.parse_args()
-    resource_catalog = cli.get_resource_catalog(args)
-    cli.execute_command(args, resource_catalog)
+    cli.add_enabled_commands(clients.enabled_commands)
+    cli.parse_args()
+    resource_catalog = get_resource_catalog(cli.get_parsed_args())
+    cli.execute_command(resource_catalog)
+
+if __name__ == "__main__":
+    main()

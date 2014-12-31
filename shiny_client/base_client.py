@@ -16,7 +16,3 @@ class PluginClientBase(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def add_parser_args(self, parser):
         pass
-
-
-def get_required_attributes(args):
-    return args.output_fields

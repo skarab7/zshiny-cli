@@ -11,6 +11,9 @@ class CategoryListCommand(object):
     help_info = ""
     _resource_name = "categories"
 
+    def __init__(self):
+        self._fields = None
+
     @property
     def endpoint(self):
         return self._endpoint
@@ -67,12 +70,10 @@ class CategoryListCommand(object):
         cm = base.create_resource_mgmt(CategoryManager, self.endpoint, self.lang, self.is_insecure,
                                        False)
 
-        fields = base_client.get_required_attributes(parsed_args)
-
         for c in cm.list_page(1):
             output = ""
             for attr in c.get_attributes():
-                if not fields or attr in fields:
+                if not self._fields or attr in self._fields:
                     output = output + "|{0}:{1}".format(attr, getattr(c, attr))
             print(output)
 
