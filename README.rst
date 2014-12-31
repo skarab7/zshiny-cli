@@ -18,11 +18,11 @@ Supported functionality
 Use case
 -----------
 
-A hacker would like to find a nice clothing for his girlfriend/boyfriend. His/Her partner likes color red, 
+A hacker would like to find a nice clothing for his girlfriend/boyfriend. His/her partner likes color red, 
 in most cases goes for unisex. The hacker knows the size and... he would like to do a good deal.
 
 She/he can not live without showing off his bash/(any other tool) skills :D. Therefore, the zshiny *MUST* 
-supports *--machine-readable*, so the output of CLI may be feed to any tool of her/his choice. Because, the gift-finding is an  iterative process, the CLI should be responsive and --- if necessary pre-fetch data.
+supports *--machine-readable*, so the output of CLI may be feed to any tool of her/his choice. Because, the gift-finding is an  iterative process, the CLI *MUST* be responsive and --- if necessary pre-fetch data.
 
 
 :: 
