@@ -1,7 +1,14 @@
 import requests
 
 
-class BaseApiResource:
+def create_resource_mgmt(cls, endpoint, lang, is_insecure, is_debug_enabled):
+    mgmt = cls()
+    mgmt.resource_url = endpoint
+    mgmt.api_lang = lang
+    return mgmt
+
+
+class BaseApiResource(object):
     """
     """
     @property

@@ -2,8 +2,34 @@ import unittest
 from shiny_client import category
 import requests
 from base_test import ApiResourceTest
+from shiny_client import base_client
 
 
+class TestCategoryListCommand(unittest.TestCase):
+
+    RESOURCE_URL = "https://api.zalando.com/categories"
+
+    def test_instantiate(self):
+        base_client.PluginClientBase.register(category.CategoryListCommand)
+        c = category.CategoryListCommand()
+        self.assertTrue(issubclass(category.CategoryListCommand, base_client.PluginClientBase))
+        self.assertTrue(isinstance(category.CategoryListCommand(), base_client.PluginClientBase))
+
+    def test_get_list(self):
+        c = category.CategoryListCommand()
+        c.lang = "EN-en"
+        c.endpoint = TestCategoryListCommand.RESOURCE_URL
+        c.is_insecure = False
+        parsed_args = lambda: None
+        parsed_args.fields = ['name', 'key', 'type', 'parentKey']
+        c.perform(parsed_args)
+
+    def test_show_schema(self):
+        c = category.CategoryListCommand()
+        # c.show_schema()
+
+
+@unittest.skip
 class TestCategoryClient(ApiResourceTest, unittest.TestCase):
 
     RESOURCE_URL = "https://api.zalando.com/categories"
