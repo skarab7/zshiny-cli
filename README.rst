@@ -12,7 +12,7 @@ Supported functionality
   
  ::
 
-   zshiny catalog-cli
+   zshiny catalog-list
 
 
 Use case
@@ -30,10 +30,11 @@ supports *--machine-readable*, so the output of CLI may be feed to any tool of h
 	# show me all brands (example with the only polish brand I know ;) )
 	zshiny brand-list | grep evaminge 
 
-	zshiny brand-get --brand-id=ev2
-	zshiny brand-get --brand-name=evaminge
+	zshiny brand-get --id=ev2
+	zshiny brand-get --name=evaminge
 
-	export MY_BRAND_ID=$(zshiny --brands-list --machine-readable | grep evaminge)
+	# we could use here brand-find as well
+	export MY_BRAND_ID=$(zshiny brand-list --machine-readable | grep evaminge)
 
 	# the type will be transform in the search full-text query
 	# next we check whether name contains it, 
@@ -54,7 +55,8 @@ Roadmap
 
 - version 0.2: parallel calling API, not (slow) sequential calling API    
 - version 0.3: caching for <tab> auto-completion
-- version 0.4: caching
+- version 0.4: python2 
+- version 0.5: caching
 - version x: 
 
     - we could support finding combinations of clothes.
