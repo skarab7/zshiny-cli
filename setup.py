@@ -12,7 +12,7 @@ except ImportError:
 config = {
     'description': 'Unofficial CLI for Zalando REST API',
     'license': 'Apache 2',
-    'long_description': read('README.rst')
+    'long_description': read('README.rst'),
     'author': 'Wojciech Barczynski',
     'url': 'URL to get it at.',
     'download_url': '',

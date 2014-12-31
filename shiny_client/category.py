@@ -1,5 +1,83 @@
 import requests
 from shiny_client import base
+from shiny_client import base_client
+
+
+class CategoryListCommand(object):
+    """
+    """
+
+    cmd = "catalog-list"
+    help_info = ""
+    _resource_name = "categories"
+
+    @property
+    def endpoint(self):
+        return self._endpoint
+
+    @endpoint.setter
+    def endpoint(self, value):
+        self._endpoint = value
+
+    @property
+    def lang(self):
+        return self._lang
+
+    @lang.setter
+    def lang(self, value):
+        self._lang = value
+
+    @property
+    def is_insecure(self):
+        return self._is_insecure
+
+    @is_insecure.setter
+    def is_insecure(self, value):
+        self._is_insecure = value
+
+    @property
+    def fields(self):
+        return self._fields
+
+    @fields.setter
+    def fields(self, value):
+        self._fields = value
+
+    @property
+    def command_name(self):
+        return CategoryListCommand.cmd
+
+    @property
+    def help_info(self):
+        return CategoryListCommand.help_info
+
+    @property
+    def resource_name(self):
+        return CategoryListCommand._resource_name
+
+    def add_parser_args(self, parser):
+        """
+        """
+        parser.add_argument(CategoryListCommand.cmd, action="store_true",
+                            help="List all the categories")
+
+    def perform(self, parsed_args):
+        """
+        """
+        cm = base.create_resource_mgmt(CategoryManager, self.endpoint, self.lang, self.is_insecure,
+                                       False)
+
+        fields = base_client.get_required_attributes(parsed_args)
+
+        for c in cm.list_page(1):
+            output = ""
+            for attr in c.get_attributes():
+                if not fields or attr in fields:
+                    output = output + "|{0}:{1}".format(attr, getattr(c, attr))
+            print(output)
+
+    def show_schema(self):
+        return CategoryManager.get_schema()
 
 
 class CategoryManager(base.ApiResource, object):
@@ -15,7 +93,8 @@ class CategoryManager(base.ApiResource, object):
     def _to_domain_object(self, json):
         return Category(json)
 
-    def get_schema(self):
+    @staticmethod
+    def get_schema():
         """
         The properties dsc were
         taken from Zalando official API docs
