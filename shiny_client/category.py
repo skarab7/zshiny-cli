@@ -1,6 +1,10 @@
 import requests
 from shiny_client import base
 from shiny_client import base_client
+from prettytable import PrettyTable
+from shiny_client import base_output
+
+CATEGORY_DEFAULT_FIELDS = ["key", "name", "type", "outlet"]
 
 
 class CategoryGetOneCommand(base_client.CommandBasicProperties, object):
@@ -10,7 +14,7 @@ class CategoryGetOneCommand(base_client.CommandBasicProperties, object):
         super(CategoryGetOneCommand, self).__init__("catalog-get",
                                                     "get a catalog entry",
                                                     "categories",
-                                                    None)
+                                                    CATEGORY_DEFAULT_FIELDS)
 
     def add_parser_args(self, parser):
         """
@@ -25,8 +29,8 @@ class CategoryGetOneCommand(base_client.CommandBasicProperties, object):
                                        False)
 
         item = cm.get(unique_id)
-        print(item.key)
-        print(item.name)
+        output = base_output.get_pretty_table_for_item(item, self._fields)
+        return output
 
 
 class CategoryFindByCommand(base_client.CommandBasicProperties, object):
@@ -36,7 +40,7 @@ class CategoryFindByCommand(base_client.CommandBasicProperties, object):
         super(CategoryFindByCommand, self).__init__("catalog-find",
                                                     "get a catalog entry",
                                                     "categories",
-                                                    None)
+                                                    CATEGORY_DEFAULT_FIELDS)
 
     def add_parser_args(self, parser):
         """
@@ -57,8 +61,8 @@ class CategoryFindByCommand(base_client.CommandBasicProperties, object):
         cm = base.create_resource_mgmt(CategoryManager, self.endpoint, self.lang, self.is_insecure,
                                        False)
 
-        for c in cm.find_by(find_by_fields):
-            print(c.name)
+        output = base_output.get_pretty_table(cm.find_by(find_by_fields), self._fields)
+        return output
 
 
 class CategoryShowSchemaCommand(base_client.CommandBasicProperties, object):
@@ -69,7 +73,7 @@ class CategoryShowSchemaCommand(base_client.CommandBasicProperties, object):
         super(CategoryShowSchemaCommand, self).__init__("catalog-show-schema",
                                                         "show catalog entry schema",
                                                         "categories",
-                                                        None)
+                                                        CATEGORY_DEFAULT_FIELDS)
 
     def add_parser_args(self, parser):
         """
@@ -78,7 +82,8 @@ class CategoryShowSchemaCommand(base_client.CommandBasicProperties, object):
                             help=self.help_info)
 
     def perform(self, parsed_args):
-        print(CategoryManager.get_schema())
+        output = base_output.get_pretty_json(CategoryManager.get_schema())
+        return output
 
 
 class CategoryStatsCommand(base_client.CommandBasicProperties, object):
@@ -87,7 +92,7 @@ class CategoryStatsCommand(base_client.CommandBasicProperties, object):
         super(CategoryListCommand, self).__init__("catalog-stats",
                                                   "stats of category resource",
                                                   "categories",
-                                                  None)
+                                                  "All")
 
     def add_parser_args(self, parser):
         """
@@ -98,7 +103,7 @@ class CategoryStatsCommand(base_client.CommandBasicProperties, object):
     def perform(self, parsed_args):
         """
         """
-        raise "Not implemented!"
+        return "Not implemented!"
 
 
 class CategoryListCommand(base_client.CommandBasicProperties, object):
@@ -108,7 +113,7 @@ class CategoryListCommand(base_client.CommandBasicProperties, object):
         super(CategoryListCommand, self).__init__("catalog-list",
                                                   "list all categories",
                                                   "categories",
-                                                  None)
+                                                  CATEGORY_DEFAULT_FIELDS)
 
     def add_parser_args(self, parser):
         """
@@ -122,12 +127,8 @@ class CategoryListCommand(base_client.CommandBasicProperties, object):
         cm = base.create_resource_mgmt(CategoryManager, self.endpoint, self.lang, self.is_insecure,
                                        False)
 
-        for c in cm.list():
-            output = ""
-            for attr in c.get_attributes():
-                if not self._fields or attr in self._fields:
-                    output = output + "|{0}:{1}".format(attr, getattr(c, attr))
-            print(output)
+        output = base_output.get_pretty_table(cm.list(), self._fields)
+        return output
 
 
 class CategoryManager(base.ApiResource, object):

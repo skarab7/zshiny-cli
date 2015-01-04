@@ -67,7 +67,7 @@ class Cli(object):
         subparser.add_argument('--machine-readable', action='store_true',
                                dest="is_machine_readable", help="NOT_IMPLEMENTED")
         subparser.add_argument('--fields', action='store', dest="output_fields",
-                               help="NOT_IMPLEMENTED", default=None)
+                               help="You can select attributes or ALL", default=None)
 
     def parse_args(self):
         """
@@ -88,7 +88,7 @@ class Cli(object):
         cmd.is_insecure = False
         if self._args.output_fields:
             cmd.fields = self._args.output_fields
-        cmd.perform(self._args)
+        return cmd.perform(self._args)
 
 
 def get_resource_url(cmd, resource_catalog):
@@ -118,7 +118,8 @@ def main():
         cli.print_parser_help_msg()
     else:
         resource_catalog = get_resource_catalog(parsed_args)
-        cli.execute_command(resource_catalog)
+        out = cli.execute_command(resource_catalog)
+        print(out)
 
 if __name__ == "__main__":
     main()
