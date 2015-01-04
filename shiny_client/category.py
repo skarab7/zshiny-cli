@@ -3,66 +3,118 @@ from shiny_client import base
 from shiny_client import base_client
 
 
-class CategoryListCommand(object):
+class CategoryGetOneCommand(base_client.CommandBasicProperties, object):
     """
     """
-
-    cmd = "catalog-list"
-    help_info = ""
-    _resource_name = "categories"
-
     def __init__(self):
-        self._fields = None
-
-    @property
-    def endpoint(self):
-        return self._endpoint
-
-    @endpoint.setter
-    def endpoint(self, value):
-        self._endpoint = value
-
-    @property
-    def lang(self):
-        return self._lang
-
-    @lang.setter
-    def lang(self, value):
-        self._lang = value
-
-    @property
-    def is_insecure(self):
-        return self._is_insecure
-
-    @is_insecure.setter
-    def is_insecure(self, value):
-        self._is_insecure = value
-
-    @property
-    def fields(self):
-        return self._fields
-
-    @fields.setter
-    def fields(self, value):
-        self._fields = value
-
-    @property
-    def command_name(self):
-        return CategoryListCommand.cmd
-
-    @property
-    def help_info(self):
-        return CategoryListCommand.help_info
-
-    @property
-    def resource_name(self):
-        return CategoryListCommand._resource_name
+        super(CategoryGetOneCommand, self).__init__("catalog-get",
+                                                    "get a catalog entry",
+                                                    "categories",
+                                                    None)
 
     def add_parser_args(self, parser):
         """
         """
-        parser.add_argument(CategoryListCommand.cmd, action="store_true",
-                            help="List all the categories")
+        parser.add_argument(self.command_name, action="store",
+                            help=self.help_info)
+
+    def perform(self, parsed_args):
+        unique_id = getattr(parsed_args, self.command_name)
+
+        cm = base.create_resource_mgmt(CategoryManager, self.endpoint, self.lang, self.is_insecure,
+                                       False)
+
+        item = cm.get(unique_id)
+        print(item.key)
+        print(item.name)
+
+
+class CategoryFindByCommand(base_client.CommandBasicProperties, object):
+    """
+    """
+    def __init__(self):
+        super(CategoryFindByCommand, self).__init__("catalog-find",
+                                                    "get a catalog entry",
+                                                    "categories",
+                                                    None)
+
+    def add_parser_args(self, parser):
+        """
+        """
+        parser.add_argument(self.command_name, action="store_true",
+                            help=self.help_info)
+        for f in CategoryManager.get_filter_fields():
+            parser.add_argument("--find-by-" + f["name"], action="store", help=f["help_info"])
+
+    def perform(self, parsed_args):
+        find_by_fields = {}
+        for f in CategoryManager.get_filter_fields():
+            f_name = f["name"]
+            v = getattr(parsed_args, "find_by_" + f_name)
+            if v is not None:
+                find_by_fields[f_name] = v
+
+        cm = base.create_resource_mgmt(CategoryManager, self.endpoint, self.lang, self.is_insecure,
+                                       False)
+
+        for c in cm.find_by(find_by_fields):
+            print(c.name)
+
+
+class CategoryShowSchemaCommand(base_client.CommandBasicProperties, object):
+    """
+    """
+
+    def __init__(self):
+        super(CategoryShowSchemaCommand, self).__init__("catalog-show-schema",
+                                                        "show catalog entry schema",
+                                                        "categories",
+                                                        None)
+
+    def add_parser_args(self, parser):
+        """
+        """
+        parser.add_argument(self.command_name, action="store_true",
+                            help=self.help_info)
+
+    def perform(self, parsed_args):
+        print(CategoryManager.get_schema())
+
+
+class CategoryStatsCommand(base_client.CommandBasicProperties, object):
+
+    def __init__(self):
+        super(CategoryListCommand, self).__init__("catalog-stats",
+                                                  "stats of category resource",
+                                                  "categories",
+                                                  None)
+
+    def add_parser_args(self, parser):
+        """
+        """
+        parser.add_argument(self.command_name, action="store_true",
+                            help=self.help_info)
+
+    def perform(self, parsed_args):
+        """
+        """
+        raise "Not implemented!"
+
+
+class CategoryListCommand(base_client.CommandBasicProperties, object):
+    """
+    """
+    def __init__(self):
+        super(CategoryListCommand, self).__init__("catalog-list",
+                                                  "list all categories",
+                                                  "categories",
+                                                  None)
+
+    def add_parser_args(self, parser):
+        """
+        """
+        parser.add_argument(self.command_name, action="store_true",
+                            help=self.help_info)
 
     def perform(self, parsed_args):
         """
@@ -70,15 +122,12 @@ class CategoryListCommand(object):
         cm = base.create_resource_mgmt(CategoryManager, self.endpoint, self.lang, self.is_insecure,
                                        False)
 
-        for c in cm.list_page(1):
+        for c in cm.list():
             output = ""
             for attr in c.get_attributes():
                 if not self._fields or attr in self._fields:
                     output = output + "|{0}:{1}".format(attr, getattr(c, attr))
             print(output)
-
-    def show_schema(self):
-        return CategoryManager.get_schema()
 
 
 class CategoryManager(base.ApiResource, object):
@@ -89,10 +138,25 @@ class CategoryManager(base.ApiResource, object):
     def __init__(self):
         """
         """
-        self._page_size = 40
+        self._page_size = 1000
 
     def _to_domain_object(self, json):
         return Category(json)
+
+    @staticmethod
+    def get_filter_fields():
+        """
+        TODO: Address the fact that it duplicates the info in json schema:
+          - most of the help msg
+          - the type
+        """
+
+        filter_fields = [{"name":"name", "type": "string", "help_info":"Filters categories by its name containing the given string (ignoring case)"},
+                         {"name":"type", "type":"string", "help_info":"Filters categories by its type containing the given string (ignoring case)"},
+                         {"name":"outlet", "type":"boolean", "help_info":"Filters outlet categories"},
+                         {"name":"hidden", "type": "boolean", "help_info":"Filters hidden categories"},
+                         {"name":"targetGroup", "type": "enum", "help_info":"Filters categories matching the given tragetGroup (all, women, men, kids)"}]
+        return filter_fields
 
     @staticmethod
     def get_schema():

@@ -78,6 +78,9 @@ class Cli(object):
     def get_parsed_args(self):
         return self._args
 
+    def print_parser_help_msg(self):
+        return self.parser.print_help()
+
     def execute_command(self, resource_catalog):
         cmd = self.clients[self._args.subparser_name]
         cmd.lang = self._args.lang
@@ -100,14 +103,22 @@ def get_resource_catalog(args):
     return result
 
 
+def is_any_parser_matched(args):
+    return args.subparser_name is not None
+
+
 def main():
     """
     """
     cli = Cli()
     cli.add_enabled_commands(clients.enabled_commands)
     cli.parse_args()
-    resource_catalog = get_resource_catalog(cli.get_parsed_args())
-    cli.execute_command(resource_catalog)
+    parsed_args = cli.get_parsed_args()
+    if not is_any_parser_matched(parsed_args):
+        cli.print_parser_help_msg()
+    else:
+        resource_catalog = get_resource_catalog(parsed_args)
+        cli.execute_command(resource_catalog)
 
 if __name__ == "__main__":
     main()
