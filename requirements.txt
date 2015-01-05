@@ -2,3 +2,4 @@ argparse
 requests
 simplejson
 prettytable
+requests-futures

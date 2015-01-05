@@ -144,7 +144,7 @@ class CategoryManager(base.ApiResource, object):
     def __init__(self):
         """
         """
-        self._page_size = 1000
+        self._page_size = 100
 
     def _to_domain_object(self, json):
         return Category(json)

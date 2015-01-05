@@ -1,4 +1,7 @@
 import requests
+import math
+from requests_futures.sessions import FuturesSession
+from concurrent.futures import ThreadPoolExecutor
 
 
 def create_resource_mgmt(cls, endpoint, lang, is_insecure, is_debug_enabled):
@@ -79,31 +82,76 @@ class ApiResource(BaseApiResource):
     def page_size(self, value):
         self._page_size = value
 
+    def get_stats(self, params={}):
+        page_size = 1
+        r = self._get_paged_request(1, page_size, params)
+        rj = r.json()
+        result = {}
+        for info in ["totalElements", "totalPages", "page", "size"]:
+            result[info] = rj[info]
+        return result
+
     def list(self, params={}):
         page_num = total_pages = 1
 
+        stats = self.get_stats(params)
+        total_pages = math.ceil(stats["totalElements"]/self._page_size)
+        print(stats)
+
+        session = FuturesSession(executor=ThreadPoolExecutor(max_workers=3))
+
+        f = [0, 0, 0]
+
+        for i in range(0, 2):
+            if page_num > total_pages:
+                break
+            args = self._get_paged_request_args(page_num, self._page_size, params)
+            f[i] = session.get(self._resource_url, **args)
+            page_num = page_num + i
+            print(total_pages)
+            print("X")
+
+        i = 0
         while page_num <= total_pages:
-            r = self._get_paged_request(page_num, self._page_size, params)
-            rj = r.json()
-            cs = rj["content"]
 
-            for c in cs:
-                yield self._to_domain_object(c)
+            if f[i % 3]:
+                r = f[i % 3].result()
+                rj = r.json()
+                cs = rj["content"]
+                print("{0}".format(rj["totalElements"]))
+                for c in cs:
+                    yield self._to_domain_object(c)
+                f[i % 3] = None
 
-            page_num = rj["page"] + 1
-            total_pages = rj["totalPages"]
+            page_num = page_num + 1
+            args = self._get_paged_request_args(page_num, self._page_size, params)
+            f[i % 3] = session.get(self._resource_url, **args)
+            i = i + 1
 
-    def _get_paged_request(self, page_num, page_size, args={}):
+        for i in range(0, 2):
+            if f[i]:
+                r = f[i].result()
+                rj = r.json()
+                cs = rj["content"]
+                for c in cs:
+                    yield self._to_domain_object(c)
+                f[i] = None
+
+    def _get_paged_request_args(self, page_num, page_size, args={}):
         paged_args = self._get_args_for_paging(page_num, page_size)
         if args:
             paged_args.update(args)
-        return self._do_request(paged_args)
+        return paged_args
 
     def _get_args_for_paging(self, page_num, page_size):
         result = {"params": {}}
         result["params"][ApiResource.PARAMETER_PAGE_SIZE] = page_size
         result["params"][ApiResource.PARAMETER_PAGE_NUMBER] = page_num
         return result
+
+    def _get_paged_request(self, page_num, page_size, args={}):
+        paged_args = self._get_paged_request_args(page_num, page_size, args)
+        return self._do_request(paged_args)
 
     def list_page(self, page_num, params={}):
         r = self._get_paged_request(page_num, self._page_size, params)
