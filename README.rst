@@ -15,6 +15,7 @@ Supported functionality
    zshiny catalog-list
    zshiny catalog-find --find-by-name shoe
    zshiny catalog-get <CATALOG_ID>
+   zshiny catalog-get <CATALOG_ID> --machine-readable
    # show json schema of catalog
    zshiny catalog-show-schema 
 

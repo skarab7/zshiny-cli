@@ -29,7 +29,12 @@ class CategoryGetOneCommand(base_client.CommandBasicProperties, object):
                                        False)
 
         item = cm.get(unique_id)
-        output = base_output.get_pretty_table_for_item(item, self._fields)
+
+        if parsed_args.is_machine_readable:
+            output = base_output.get_print_for_item(item, self._fields)
+        else:
+            output = base_output.get_pretty_table_for_item(item, self._fields)
+
         return output
 
 

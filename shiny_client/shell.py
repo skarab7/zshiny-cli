@@ -65,7 +65,7 @@ class Cli(object):
                                action='store_true',
                                dest="is_debug_enabled", help="NOT_IMPLEMENTED")
         subparser.add_argument('--machine-readable', action='store_true',
-                               dest="is_machine_readable", help="NOT_IMPLEMENTED")
+                               dest="is_machine_readable", help="if enabled, no pretty print used")
         subparser.add_argument('--fields', action='store', dest="output_fields",
                                help="You can select attributes or ALL", default=None)
 
