@@ -65,9 +65,9 @@ class Cli(object):
                                action='store_true',
                                dest="is_debug_enabled", help="NOT_IMPLEMENTED")
         subparser.add_argument('--machine-readable', action='store_true',
-                               dest="is_machine_readable", help="NOT_IMPLEMENTED")
+                               dest="is_machine_readable", help="if enabled, no pretty print used")
         subparser.add_argument('--fields', action='store', dest="output_fields",
-                               help="NOT_IMPLEMENTED", default=None)
+                               help="You can select attributes or ALL", default=None)
 
     def parse_args(self):
         """
@@ -78,6 +78,9 @@ class Cli(object):
     def get_parsed_args(self):
         return self._args
 
+    def print_parser_help_msg(self):
+        return self.parser.print_help()
+
     def execute_command(self, resource_catalog):
         cmd = self.clients[self._args.subparser_name]
         cmd.lang = self._args.lang
@@ -85,7 +88,7 @@ class Cli(object):
         cmd.is_insecure = False
         if self._args.output_fields:
             cmd.fields = self._args.output_fields
-        cmd.perform(self._args)
+        return cmd.perform(self._args)
 
 
 def get_resource_url(cmd, resource_catalog):
@@ -100,14 +103,23 @@ def get_resource_catalog(args):
     return result
 
 
+def is_any_parser_matched(args):
+    return args.subparser_name is not None
+
+
 def main():
     """
     """
     cli = Cli()
     cli.add_enabled_commands(clients.enabled_commands)
     cli.parse_args()
-    resource_catalog = get_resource_catalog(cli.get_parsed_args())
-    cli.execute_command(resource_catalog)
+    parsed_args = cli.get_parsed_args()
+    if not is_any_parser_matched(parsed_args):
+        cli.print_parser_help_msg()
+    else:
+        resource_catalog = get_resource_catalog(parsed_args)
+        out = cli.execute_command(resource_catalog)
+        print(out)
 
 if __name__ == "__main__":
     main()

@@ -13,6 +13,11 @@ Supported functionality
  ::
 
    zshiny catalog-list
+   zshiny catalog-find --find-by-name shoe
+   zshiny catalog-get <CATALOG_ID>
+   zshiny catalog-get <CATALOG_ID> --machine-readable
+   # show json schema of catalog
+   zshiny catalog-show-schema 
 
 
 Use case
@@ -55,7 +60,7 @@ Roadmap
 
 - version 0.2: parallel calling API, not (slow) sequential calling API    
 - version 0.3: caching for <tab> auto-completion
-- version 0.4: python2 
+- version 0.4: python 
 - version 0.5: caching
 - version x: 
 
