@@ -10,10 +10,10 @@ class TestCategoryListCommand(unittest.TestCase):
     RESOURCE_URL = "https://api.zalando.com/categories"
 
     def test_instantiate(self):
-        base_client.PluginClientBase.register(category.CategoryListCommand)
+        base_client.PluginCommandBase.register(category.CategoryListCommand)
         c = category.CategoryListCommand()
-        self.assertTrue(issubclass(category.CategoryListCommand, base_client.PluginClientBase))
-        self.assertTrue(isinstance(category.CategoryListCommand(), base_client.PluginClientBase))
+        self.assertTrue(issubclass(category.CategoryListCommand, base_client.PluginCommandBase))
+        self.assertTrue(isinstance(category.CategoryListCommand(), base_client.PluginCommandBase))
 
     def test_get_list(self):
         c = category.CategoryListCommand()
