@@ -73,10 +73,10 @@ Status
     - brand 
     - domains
 
-   - command options:
+    - command options:
 
-     - fields [PARTIALLY]
-     - pretty-print & machine-readable [PARTIALLY]
+      - fields [PARTIALLY]
+      - pretty-print & machine-readable [PARTIALLY]
 
 - version 0.2: caching for <tab> auto-completion
 - version 0.3: port to python 2.6
