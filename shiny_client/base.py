@@ -100,15 +100,14 @@ class ApiResource(BaseApiResource):
         return result
 
     def list(self, params={}):
-        page_num = 1
-
+        """
+        """
         stats = self.get_stats(params)
         total_pages = math.ceil(stats[ApiResource.TOTAL_NUMBER_ATTR]/self._page_size)
+        f = []
+        page_num = 1
         num_of_exectors = 3
         session = FuturesSession(executor=ThreadPoolExecutor(max_workers=num_of_exectors))
-
-        f = []
-
         #
         # initialize the connections
         #
@@ -141,7 +140,7 @@ class ApiResource(BaseApiResource):
             page_num = page_num + 1
 
         #
-        # wait for the all connections to be completed
+        # wait for the all requests to be completed
         #
         for i in range(0, num_of_exectors):
             f_r = f[j % num_of_exectors]
