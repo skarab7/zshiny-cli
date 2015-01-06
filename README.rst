@@ -51,17 +51,36 @@ supports *--machine-readable*, so the output of CLI may be feed to any tool of h
 	# get fields with supported full-text queries
 	zshiny article-filter-list
 
-Roadmap
+Development 
+------------
+
+The project entry point is *Makefile*:
+
+  - setting up virtualenv
+  - running tests
+  - (more to come)
+
+Status
 ------------
 
 - version 0.1 (IN PROGRESS):
-	
-	- support for all Zalando Resources
 
-- version 0.2: parallel calling API, not (slow) sequential calling API    
-- version 0.3: caching for <tab> auto-completion
-- version 0.4: python 
-- version 0.5: caching
+  - parallel calling API [COMPLETED]
+  - support for all Zalando Resources in CLI:
+
+    - catalog [COMPLETED]
+    - article and article-filters [IN PROGRESS]
+    - brand 
+    - domains
+
+   - command options:
+
+     - fields [PARTIALLY]
+     - pretty-print & machine-readable [PARTIALLY]
+
+- version 0.2: caching for <tab> auto-completion
+- version 0.3: port to python 2.6
+- version 0.4: caching
 - version x: 
 
     - we could support finding combinations of clothes.
