@@ -81,6 +81,8 @@ class ApiResource(BaseApiResource):
     REQ_ATTR_PAGE_SIZE = "pageSize"
     REQ_ATTR_PAGE_NUMBER = "page"
 
+    NUM_OF_EXECUTORS = 3
+
     @property
     def page_size(self):
         return self._page_size
@@ -99,14 +101,16 @@ class ApiResource(BaseApiResource):
             result[info] = rj[info]
         return result
 
+    # TODO: refactor, extract common functionality
     def list(self, params={}):
         """
         """
+        # First request to get stats about resource
         stats = self.get_stats(params)
         total_pages = math.ceil(stats[ApiResource.TOTAL_NUMBER_ATTR]/self._page_size)
         future_reqs = []
         page_num = 1
-        num_of_exectors = 3
+        num_of_exectors = ApiResource.NUM_OF_EXECUTORS
         session = FuturesSession(executor=ThreadPoolExecutor(max_workers=num_of_exectors))
         #
         # initialize the connections
