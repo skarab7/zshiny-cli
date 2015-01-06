@@ -104,7 +104,7 @@ class ApiResource(BaseApiResource):
         """
         stats = self.get_stats(params)
         total_pages = math.ceil(stats[ApiResource.TOTAL_NUMBER_ATTR]/self._page_size)
-        f = []
+        future_reqs = []
         page_num = 1
         num_of_exectors = 3
         session = FuturesSession(executor=ThreadPoolExecutor(max_workers=num_of_exectors))
@@ -115,7 +115,7 @@ class ApiResource(BaseApiResource):
             if page_num > total_pages:
                 break
             f_r = self._async_do_paged_request(session, page_num, params)
-            f.append(f_r)
+            future_reqs.append(f_r)
             page_num = page_num + 1
 
         #
@@ -123,15 +123,17 @@ class ApiResource(BaseApiResource):
         #
         j = 0
         while page_num <= total_pages:
-            f_r = f[j % num_of_exectors]
+            idx_current_req = j % num_of_exectors
+            f_r = future_reqs[idx_current_req]
             if f_r:
                 r = f_r.result()
                 rj = r.json()
                 cs = rj["content"]
                 for c in cs:
                     yield self._to_domain_object(c)
-                f[j % num_of_exectors] = None
-            f[j % num_of_exectors] = self._async_do_paged_request(session, page_num, params)
+                future_reqs[idx_current_req] = None
+            future_reqs[idx_current_req] = self._async_do_paged_request(session,
+                                                                        page_num, params)
             j = j + 1
             page_num = page_num + 1
 
@@ -139,14 +141,15 @@ class ApiResource(BaseApiResource):
         # wait for the all requests to be completed
         #
         for i in range(0, num_of_exectors):
-            f_r = f[j % num_of_exectors]
+            idx_current_req = j % num_of_exectors
+            f_r = future_reqs[idx_current_req]
             if f_r:
                 r = f_r.result()
                 rj = r.json()
                 cs = rj["content"]
                 for c in cs:
                     yield self._to_domain_object(c)
-                f[j % num_of_exectors] = None
+                future_reqs[idx_current_req] = None
             j = j + 1
 
     def _get_paged_request_args(self, page_num, page_size, args={}):
