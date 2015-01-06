@@ -5,7 +5,6 @@ from base_test import ApiResourceTest
 from shiny_client import base_client
 
 
-@unittest.skip
 class TestCategoryListCommand(unittest.TestCase):
 
     RESOURCE_URL = "https://api.zalando.com/categories"
