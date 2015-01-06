@@ -50,13 +50,12 @@ class TestCategoryClient(ApiResourceTest, unittest.TestCase):
     def test_find_by_name_and_outlet(self):
         mgmt = self._get_resource_mgmt()
         query = {"name": "s"}
-
+        stats = mgmt.get_stats(query)
         is_found = 0
         for c in mgmt.find_by(query):
-            print("{} {}".format(c.name, c.key))
             is_found = is_found + 1
-        print(is_found)
-        self.assertTrue(is_found)
+
+        self.assertEquals(is_found, stats["totalElements"])
 
     def test_get_one_category(self):
         """

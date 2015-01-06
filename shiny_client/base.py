@@ -44,10 +44,13 @@ class BaseApiResource(object):
 
     @_request_raise_for_status
     def _do_request_url(self, url, args={}):
-        if self._api_lang:
-            args["headers"] = {"Accept-Language": self._api_lang}
+        self._apply_lang(args)
         r = requests.get(url, **args)
         return r
+
+    def _apply_lang(self, args):
+        if self._api_lang:
+            args["headers"] = {"Accept-Language": self._api_lang}
 
 
 class SimpleApiResource(BaseApiResource):
@@ -71,8 +74,12 @@ class ApiResource(BaseApiResource):
     A mix-in requires from the base
     class to implement *_to_domain_object*.
     """
-    PARAMETER_PAGE_SIZE = "size"
-    PARAMETER_PAGE_NUMBER = "page"
+    PAGE_SIZE_ATTR = "size"
+    PAGE_NUMBER_ATTR = "page"
+    TOTAL_NUMBER_ATTR = "totalElements"
+    TOTAL_NUMER_PAGES_ATTR = "totalPages"
+    REQ_ATTR_PAGE_SIZE = "pageSize"
+    REQ_ATTR_PAGE_NUMBER = "page"
 
     @property
     def page_size(self):
@@ -87,66 +94,76 @@ class ApiResource(BaseApiResource):
         r = self._get_paged_request(1, page_size, params)
         rj = r.json()
         result = {}
-        for info in ["totalElements", "totalPages", "page", "size"]:
+        for info in [ApiResource.TOTAL_NUMBER_ATTR, ApiResource.TOTAL_NUMER_PAGES_ATTR,
+                     ApiResource.PAGE_NUMBER_ATTR, ApiResource.PAGE_SIZE_ATTR]:
             result[info] = rj[info]
         return result
 
     def list(self, params={}):
-        page_num = total_pages = 1
+        page_num = 1
 
         stats = self.get_stats(params)
-        total_pages = math.ceil(stats["totalElements"]/self._page_size)
-        print(stats)
+        total_pages = math.ceil(stats[ApiResource.TOTAL_NUMBER_ATTR]/self._page_size)
+        num_of_exectors = 3
+        session = FuturesSession(executor=ThreadPoolExecutor(max_workers=num_of_exectors))
 
-        session = FuturesSession(executor=ThreadPoolExecutor(max_workers=3))
+        f = []
 
-        f = [0, 0, 0]
-
-        for i in range(0, 2):
+        #
+        # initialize the connections
+        #
+        for i in range(0, num_of_exectors):
             if page_num > total_pages:
                 break
             args = self._get_paged_request_args(page_num, self._page_size, params)
-            f[i] = session.get(self._resource_url, **args)
-            page_num = page_num + i
-            print(total_pages)
-            print("X")
-
-        i = 0
-        while page_num <= total_pages:
-
-            if f[i % 3]:
-                r = f[i % 3].result()
-                rj = r.json()
-                cs = rj["content"]
-                print("{0}".format(rj["totalElements"]))
-                for c in cs:
-                    yield self._to_domain_object(c)
-                f[i % 3] = None
-
+            self._apply_lang(args)
+            f.append(session.get(self._resource_url, **args))
             page_num = page_num + 1
-            args = self._get_paged_request_args(page_num, self._page_size, params)
-            f[i % 3] = session.get(self._resource_url, **args)
-            i = i + 1
 
-        for i in range(0, 2):
-            if f[i]:
-                r = f[i].result()
+        #
+        # Harvesting, keep order
+        #
+        j = 0
+        while page_num <= total_pages:
+            f_r = f[j % num_of_exectors]
+            if f_r:
+                r = f_r.result()
                 rj = r.json()
                 cs = rj["content"]
                 for c in cs:
                     yield self._to_domain_object(c)
-                f[i] = None
+                f[j % num_of_exectors] = None
+
+            args = self._get_paged_request_args(page_num, self._page_size, params)
+            self._apply_lang(args)
+            f[j % num_of_exectors] = session.get(self._resource_url, **args)
+            j = j + 1
+            page_num = page_num + 1
+
+        #
+        # wait for the all connections to be completed
+        #
+        for i in range(0, num_of_exectors):
+            f_r = f[j % num_of_exectors]
+            if f_r:
+                r = f_r.result()
+                rj = r.json()
+                cs = rj["content"]
+                for c in cs:
+                    yield self._to_domain_object(c)
+                f[j % num_of_exectors] = None
+            j = j + 1
 
     def _get_paged_request_args(self, page_num, page_size, args={}):
         paged_args = self._get_args_for_paging(page_num, page_size)
         if args:
-            paged_args.update(args)
+            paged_args["params"].update(args)
         return paged_args
 
     def _get_args_for_paging(self, page_num, page_size):
         result = {"params": {}}
-        result["params"][ApiResource.PARAMETER_PAGE_SIZE] = page_size
-        result["params"][ApiResource.PARAMETER_PAGE_NUMBER] = page_num
+        result["params"][ApiResource.REQ_ATTR_PAGE_SIZE] = page_size
+        result["params"][ApiResource.REQ_ATTR_PAGE_NUMBER] = page_num
         return result
 
     def _get_paged_request(self, page_num, page_size, args={}):
@@ -162,7 +179,7 @@ class ApiResource(BaseApiResource):
             yield self._to_domain_object(c)
 
     def find_by(self, key_value):
-        filter_params = {"params": key_value}
+        filter_params = key_value
         return self.list(filter_params)
 
     def get(self, key):
