@@ -114,9 +114,8 @@ class ApiResource(BaseApiResource):
         for i in range(0, num_of_exectors):
             if page_num > total_pages:
                 break
-            args = self._get_paged_request_args(page_num, self._page_size, params)
-            self._apply_lang(args)
-            f.append(session.get(self._resource_url, **args))
+            f_r = self._async_do_paged_request(session, page_num, params)
+            f.append(f_r)
             page_num = page_num + 1
 
         #
@@ -132,10 +131,7 @@ class ApiResource(BaseApiResource):
                 for c in cs:
                     yield self._to_domain_object(c)
                 f[j % num_of_exectors] = None
-
-            args = self._get_paged_request_args(page_num, self._page_size, params)
-            self._apply_lang(args)
-            f[j % num_of_exectors] = session.get(self._resource_url, **args)
+            f[j % num_of_exectors] = self._async_do_paged_request(session, page_num, params)
             j = j + 1
             page_num = page_num + 1
 
@@ -164,6 +160,11 @@ class ApiResource(BaseApiResource):
         result["params"][ApiResource.REQ_ATTR_PAGE_SIZE] = page_size
         result["params"][ApiResource.REQ_ATTR_PAGE_NUMBER] = page_num
         return result
+
+    def _async_do_paged_request(self, session, page_num, params):
+        args = self._get_paged_request_args(page_num, self._page_size, params)
+        self._apply_lang(args)
+        return session.get(self._resource_url, **args)
 
     def _sync_do_paged_request(self, page_num, page_size, args={}):
         paged_args = self._get_paged_request_args(page_num, page_size, args)
