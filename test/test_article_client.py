@@ -61,7 +61,7 @@ class TestArticleClient(ApiResourceTest, unittest.TestCase):
         prev_value = 0
 
         is_first_iteration = True
-        for c in mgmt.list_page(2, {"params": {sort_param: sort_option}}):
+        for c in mgmt.list_page(2, {sort_param: sort_option}):
             if(is_first_iteration):
                 is_first_iteration = False
             else:

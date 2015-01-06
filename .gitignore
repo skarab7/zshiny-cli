@@ -1,0 +1,6 @@
+build/*
+dist/*
+shiny_client/__pycache__/*
+README.pdf
+test/__pycache__/*
+.idea/*

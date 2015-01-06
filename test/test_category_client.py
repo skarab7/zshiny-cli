@@ -5,6 +5,7 @@ from base_test import ApiResourceTest
 from shiny_client import base_client
 
 
+@unittest.skip
 class TestCategoryListCommand(unittest.TestCase):
 
     RESOURCE_URL = "https://api.zalando.com/categories"
@@ -29,7 +30,6 @@ class TestCategoryListCommand(unittest.TestCase):
         # c.show_schema()
 
 
-@unittest.skip
 class TestCategoryClient(ApiResourceTest, unittest.TestCase):
 
     RESOURCE_URL = "https://api.zalando.com/categories"
@@ -49,13 +49,13 @@ class TestCategoryClient(ApiResourceTest, unittest.TestCase):
 
     def test_find_by_name_and_outlet(self):
         mgmt = self._get_resource_mgmt()
-        query = {"name": "Szaliki kominy", "targetGroup": "WOMEN",
-                 "outlet": True}
-
+        query = {"name": "s"}
+        stats = mgmt.get_stats(query)
+        is_found = 0
         for c in mgmt.find_by(query):
-            self.assertTrue(c.outlet)
-            self.assertContains(c.name.lower(), "szalik")
-            self.assertContains(c.name.lower(), "kominy")
+            is_found = is_found + 1
+
+        self.assertEquals(is_found, stats["totalElements"])
 
     def test_get_one_category(self):
         """
@@ -74,3 +74,8 @@ class TestCategoryClient(ApiResourceTest, unittest.TestCase):
         not_existing_key = "test-test-test-test"
         with self.assertRaises(requests.HTTPError):
             category = mgmt.get(not_existing_key)
+
+    def test_get_stats(self):
+        mgmt = self._get_resource_mgmt()
+        result = mgmt.get_stats()
+        self.assertTrue("totalElements" in result)
