@@ -91,7 +91,7 @@ class ApiResource(BaseApiResource):
 
     def get_stats(self, params={}):
         page_size = 1
-        r = self._get_paged_request(1, page_size, params)
+        r = self._sync_do_paged_request(1, page_size, params)
         rj = r.json()
         result = {}
         for info in [ApiResource.TOTAL_NUMBER_ATTR, ApiResource.TOTAL_NUMER_PAGES_ATTR,
@@ -165,12 +165,12 @@ class ApiResource(BaseApiResource):
         result["params"][ApiResource.REQ_ATTR_PAGE_NUMBER] = page_num
         return result
 
-    def _get_paged_request(self, page_num, page_size, args={}):
+    def _sync_do_paged_request(self, page_num, page_size, args={}):
         paged_args = self._get_paged_request_args(page_num, page_size, args)
         return self._do_request(paged_args)
 
     def list_page(self, page_num, params={}):
-        r = self._get_paged_request(page_num, self._page_size, params)
+        r = self._sync_do_paged_request(page_num, self._page_size, params)
         rj = r.json()
         cs = rj["content"]
 
