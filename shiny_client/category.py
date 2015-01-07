@@ -99,7 +99,7 @@ class CategoryStatsCommand(base_client.CommandBasicProperties, object):
         super(CategoryStatsCommand, self).__init__("catalog-stats",
                                                    "stats of category resource",
                                                    "categories",
-                                                   CATEGORY_DEFAULT_FIELDS)
+                                                   ["totalElements"])
 
     def add_parser_args(self, parser):
         """
@@ -112,7 +112,9 @@ class CategoryStatsCommand(base_client.CommandBasicProperties, object):
         """
         cm = base.create_resource_mgmt(CategoryManager, self.endpoint, self.lang, self.is_insecure,
                                        False)
-        print(cm.get_stats())
+        printed_stats = dict((k, v) for k, v in cm.get_stats().items() if k in self._fields)
+
+        base_output.print_stats(parsed_args, printed_stats)
 
 
 class CategoryListCommand(base_client.CommandBasicProperties, object):

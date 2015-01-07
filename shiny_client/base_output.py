@@ -82,3 +82,35 @@ def get_pretty_table(categories, output_fields):
 
 def get_pretty_json(json_schema):
     return json_schema
+
+
+def print_stats(parsed_args, stats):
+    if parsed_args.is_machine_readable:
+        print_machine_readable_stats(stats)
+    else:
+        out = get_print_pretty_table_stats(stats)
+        print(out)
+
+
+def print_machine_readable_stats(stats):
+    # list is necessary, because keys are set-alike view
+    keys = sorted(list(stats.keys()))
+    print(",".join(keys))
+
+    row = []
+    for k in keys:
+        row.append("{0}".format(stats[k]))
+    print(",".join(row))
+
+
+def get_print_pretty_table_stats(stats):
+    # list is necessary, because keys are set-alike view
+    keys = sorted(list(stats.keys()))
+    print(keys)
+    x = PrettyTable(keys)
+
+    row = []
+    for k in keys:
+        row.append("{0}".format(stats[k]))
+    x.add_row(row)
+    return x
