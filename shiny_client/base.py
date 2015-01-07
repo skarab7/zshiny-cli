@@ -82,6 +82,7 @@ class ApiResource(BaseApiResource):
     REQ_ATTR_PAGE_NUMBER = "page"
 
     NUM_OF_EXECUTORS = 3
+    NUM_OF_PARALLEL_REQUESTS = 4
 
     @property
     def page_size(self):
@@ -102,6 +103,7 @@ class ApiResource(BaseApiResource):
         return result
 
     # TODO: refactor, extract common functionality
+    # TODO: split it into many short and easy to understand functions
     def list(self, params={}):
         """
         """
@@ -110,24 +112,26 @@ class ApiResource(BaseApiResource):
         total_pages = math.ceil(stats[ApiResource.TOTAL_NUMBER_ATTR]/self._page_size)
         future_reqs = []
         page_num = 1
-        num_of_exectors = ApiResource.NUM_OF_EXECUTORS
-        session = FuturesSession(executor=ThreadPoolExecutor(max_workers=num_of_exectors))
+        init_num_of_parallel_req = ApiResource.NUM_OF_PARALLEL_REQUESTS
+        session = FuturesSession(executor=ThreadPoolExecutor(
+            max_workers=ApiResource.NUM_OF_EXECUTORS))
         #
         # initialize the connections
         #
-        for i in range(0, num_of_exectors):
+        for i in range(0, init_num_of_parallel_req):
             if page_num > total_pages:
                 break
             f_r = self._async_do_paged_request(session, page_num, params)
             future_reqs.append(f_r)
             page_num = page_num + 1
 
+        num_of_parallel_req = min(len(future_reqs), init_num_of_parallel_req)
         #
         # Harvesting, keep order
         #
         j = 0
         while page_num <= total_pages:
-            idx_current_req = j % num_of_exectors
+            idx_current_req = j % num_of_parallel_req
             f_r = future_reqs[idx_current_req]
             if f_r:
                 r = f_r.result()
@@ -144,8 +148,8 @@ class ApiResource(BaseApiResource):
         #
         # wait for the all requests to be completed
         #
-        for i in range(0, num_of_exectors):
-            idx_current_req = j % num_of_exectors
+        for i in range(0, num_of_parallel_req):
+            idx_current_req = j % num_of_parallel_req
             f_r = future_reqs[idx_current_req]
             if f_r:
                 r = f_r.result()
