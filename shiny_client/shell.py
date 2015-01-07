@@ -52,13 +52,18 @@ class Cli(object):
         subparser.add_argument('--insecure',
                                action='store_true',
                                dest="is_insecure",
-                               default=False)
+                               default=False,
+                               help="NOT_IMPLEMENTED")
         subparser.add_argument('--endpoint',
                                dest="endpoint",
-                               default=ZALANDO_ENDPOINT
+                               default=ZALANDO_ENDPOINT,
+                               help="""Zalando Endpoint, default: https://api.zalando.com \
+or env['ZALANDO_API_ENDPOINT']"""
                                )
         subparser.add_argument('--lang',
-                               dest="lang")
+                               dest="lang",
+                               help="API LANG enpoint, so you can query zalando offer \
+in different countries")
 
     def _add_output_options_args(self, subparser):
         subparser.add_argument('--debug',
