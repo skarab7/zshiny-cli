@@ -3,7 +3,7 @@ import argparse
 import os
 from shiny_client import base_client
 from shiny_client.base import create_resource_mgmt
-from shiny_client import clients
+from shiny_client import commands
 from shiny_client.discovery_service import ResourceEndpointManager
 
 ZALANDO_ENDPOINT = os.environ.get("ZALANDO_API_ENDPOINT",
@@ -117,7 +117,7 @@ def main():
     """
     """
     cli = Cli()
-    cli.add_enabled_commands(clients.enabled_commands)
+    cli.add_enabled_commands(commands.enabled_commands)
     cli.parse_args()
     parsed_args = cli.get_parsed_args()
     if not is_any_parser_matched(parsed_args):
