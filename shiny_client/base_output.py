@@ -48,7 +48,8 @@ def print_list(parsed_args, item_generator, output_fields):
         print_machine_readable_list(item_generator, output_fields)
     else:
         out = get_pretty_table(item_generator, output_fields)
-        print(out)
+        if out:
+            print(out)
 
 
 def print_machine_readable_list(items, output_fields):
@@ -66,6 +67,7 @@ def print_machine_readable_list(items, output_fields):
 
 def get_pretty_table(categories, output_fields):
     attrs = None
+    x = None
     for c in categories:
         if attrs is None:
             attrs = _filter_attributes(c.get_attributes(), output_fields)
@@ -75,8 +77,6 @@ def get_pretty_table(categories, output_fields):
         for attr in attrs:
             row.append(getattr(c, attr))
         x.add_row(row)
-    else:
-        x = ""
     return x
 
 
