@@ -65,7 +65,8 @@ class Cli(object):
                                action='store_true',
                                dest="is_debug_enabled", help="NOT_IMPLEMENTED")
         subparser.add_argument('--machine-readable', action='store_true',
-                               dest="is_machine_readable", help="if enabled, no pretty print used")
+                               dest="is_machine_readable", help="if enabled, no pretty print used",
+                               default=False)
         subparser.add_argument('--fields', action='store', dest="output_fields",
                                help="You can select attributes or ALL", default=None)
 
@@ -118,8 +119,7 @@ def main():
         cli.print_parser_help_msg()
     else:
         resource_catalog = get_resource_catalog(parsed_args)
-        out = cli.execute_command(resource_catalog)
-        print(out)
+        cli.execute_command(resource_catalog)
 
 if __name__ == "__main__":
     main()

@@ -1,7 +1,15 @@
 from prettytable import PrettyTable
 
 
-def get_print_for_item(item, output_fields):
+def print_item(parsed_args, item, fields):
+        if parsed_args.is_machine_readable:
+            print_machine_readable_item(item, fields)
+        else:
+            output = get_pretty_table_for_item(item, fields)
+            print(output)
+
+
+def print_machine_readable_item(item, output_fields):
 
     attrs = _filter_attributes(item.get_attributes(), output_fields)
 
@@ -10,15 +18,14 @@ def get_print_for_item(item, output_fields):
         row.append(attr)
         row.append(str(getattr(item, attr)))
         print(",".join(row))
-    return ""
 
 
 def _filter_attributes(attrs, output_fields):
     return [attr for attr in attrs
-            if should_attr_be_printed(output_fields, attr)]
+            if _should_attr_be_printed(output_fields, attr)]
 
 
-def should_attr_be_printed(output_fields, attr):
+def _should_attr_be_printed(output_fields, attr):
         return "all" in output_fields or attr in output_fields
 
 
@@ -36,6 +43,27 @@ def get_pretty_table_for_item(item, output_fields):
     return x
 
 
+def print_list(parsed_args, item_generator, output_fields):
+    if parsed_args.is_machine_readable:
+        print_machine_readable_list(item_generator, output_fields)
+    else:
+        out = get_pretty_table(item_generator, output_fields)
+        print(out)
+
+
+def print_machine_readable_list(items, output_fields):
+    attrs = None
+    for i in items:
+        if attrs is None:
+            attrs = _filter_attributes(i.get_attributes(), output_fields)
+            print(",".join(attrs))
+        row = []
+        for attr in attrs:
+            v = getattr(i, attr)
+            row.append(v)
+        print(",".join(map(str, row)))
+
+
 def get_pretty_table(categories, output_fields):
     attrs = None
     for c in categories:
@@ -46,7 +74,6 @@ def get_pretty_table(categories, output_fields):
         row = []
         for attr in attrs:
             row.append(getattr(c, attr))
-        print(row)
         x.add_row(row)
     else:
         x = ""

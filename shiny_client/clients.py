@@ -13,4 +13,4 @@ add_command(category.CategoryListCommand)
 add_command(category.CategoryShowSchemaCommand)
 add_command(category.CategoryGetOneCommand)
 add_command(category.CategoryFindByCommand)
-# add_command(category.CategoryStatsCommand) # ClientManager extension is pending
+add_command(category.CategoryStatsCommand)

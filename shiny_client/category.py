@@ -29,13 +29,13 @@ class CategoryGetOneCommand(base_client.CommandBasicProperties, object):
                                        False)
 
         item = cm.get(unique_id)
+        self._print_item(parsed_args, item)
 
-        if parsed_args.is_machine_readable:
-            output = base_output.get_print_for_item(item, self._fields)
-        else:
-            output = base_output.get_pretty_table_for_item(item, self._fields)
-
-        return output
+    def _print_item(self, parsed_args, item):
+        """
+        A separated function that can be overwritten in the tests to not print out
+        """
+        base_output.print_item(parsed_args, item, self._fields)
 
 
 class CategoryFindByCommand(base_client.CommandBasicProperties, object):
@@ -66,8 +66,10 @@ class CategoryFindByCommand(base_client.CommandBasicProperties, object):
         cm = base.create_resource_mgmt(CategoryManager, self.endpoint, self.lang, self.is_insecure,
                                        False)
 
-        output = base_output.get_pretty_table(cm.find_by(find_by_fields), self._fields)
-        return output
+        self._print_list(parsed_args, cm.find_by(find_by_fields))
+
+    def _print_list(self, parsed_args, items):
+        base_output.print_list(parsed_args, items, self._fields)
 
 
 class CategoryShowSchemaCommand(base_client.CommandBasicProperties, object):
@@ -88,16 +90,16 @@ class CategoryShowSchemaCommand(base_client.CommandBasicProperties, object):
 
     def perform(self, parsed_args):
         output = base_output.get_pretty_json(CategoryManager.get_schema())
-        return output
+        print(output)
 
 
 class CategoryStatsCommand(base_client.CommandBasicProperties, object):
 
     def __init__(self):
-        super(CategoryListCommand, self).__init__("catalog-stats",
-                                                  "stats of category resource",
-                                                  "categories",
-                                                  "All")
+        super(CategoryStatsCommand, self).__init__("catalog-stats",
+                                                   "stats of category resource",
+                                                   "categories",
+                                                   CATEGORY_DEFAULT_FIELDS)
 
     def add_parser_args(self, parser):
         """
@@ -108,7 +110,9 @@ class CategoryStatsCommand(base_client.CommandBasicProperties, object):
     def perform(self, parsed_args):
         """
         """
-        return "Not implemented!"
+        cm = base.create_resource_mgmt(CategoryManager, self.endpoint, self.lang, self.is_insecure,
+                                       False)
+        print(cm.get_stats())
 
 
 class CategoryListCommand(base_client.CommandBasicProperties, object):
@@ -132,8 +136,10 @@ class CategoryListCommand(base_client.CommandBasicProperties, object):
         cm = base.create_resource_mgmt(CategoryManager, self.endpoint, self.lang, self.is_insecure,
                                        False)
 
-        output = base_output.get_pretty_table(cm.list(), self._fields)
-        return output
+        self._print_list(parsed_args, cm.list())
+
+    def _print_list(self, parsed_args, items):
+        base_output.print_list(parsed_args, items, self._fields)
 
 
 class CategoryManager(base.ApiResource, object):
