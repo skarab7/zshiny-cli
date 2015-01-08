@@ -73,7 +73,7 @@ in different countries")
         subparser.add_argument('--machine-readable', action='store_true',
                                dest="is_machine_readable", help="if enabled, no pretty print used",
                                default=False)
-        subparser.add_argument('--fields', action='store', dest="output_fields",
+        subparser.add_argument('--fields', action='store', dest="output_fields", nargs='+',
                                help="You can select attributes or ALL", default=None)
 
     def parse_args(self):
