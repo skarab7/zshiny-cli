@@ -1,7 +1,6 @@
 from shiny_client import base
 from shiny_client import base_client
 from shiny_client import base_output
-from shiny_client import article_filter
 
 ARTICLE_DEFAULT_FIELDS = ["name", "id", "model-id", "color", "genders"]
 
