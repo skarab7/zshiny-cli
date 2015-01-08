@@ -53,19 +53,19 @@ class ArticleFindByFilterCommand(base_client.CommandBasicProperties, object):
                             help=self.help_info)
 
         parser.add_argument("--filter-values", action="store", nargs='+',
-                            help="""A list of <filter name : filter value> separated by comma. \
+                            help="""A list of <filter name : filter value> separated by space. \
 Check the available filter names and possible values with \
 article filter-list command.""")
 
     def perform(self, parsed_args):
-        print(parsed_args)
-
         find_by_filter = {}
         for fv in parsed_args.filter_values:
             separator_pos = fv.find(":")
             fn = fv[0:separator_pos]
             fv = fv[separator_pos + 1:]
-            find_by_filter[fn] = fv
+            if fn not in find_by_filter:
+                find_by_filter[fn] = []
+            find_by_filter[fn].append(fv)
         cm = base.create_resource_mgmt(ArticleManager, self.endpoint, self.lang, self.is_insecure,
                                        False)
 
