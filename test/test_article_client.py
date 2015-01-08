@@ -56,8 +56,9 @@ class TestArticleClient(ApiResourceTest, unittest.TestCase):
         mgmt = self._get_resource_mgmt()
         sort_param = mgmt.get_sort_param()
         all_options = mgmt.get_sort_options()
-        self.assertTrue(sort_option in all_options)
 
+        op = (o["name"] for o in all_options if o["name"] == sort_option)
+        self.assertIsNotNone(next(op))
         prev_value = 0
 
         is_first_iteration = True
