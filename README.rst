@@ -21,13 +21,15 @@ Supported functionality
 
 - article:
   
-  zshiny article-list
-  # simple single values supported now
-  zshiny article-find-by-filter --filter-value color:red
-  zshiny article-get IQ142B008-G11
-  zshiny article-get IQ142B008-G11  --machine-readable
-  # show json schema:
-  zshiny article-show-schema
+ ::
+
+   zshiny article-list
+   # simple single values supported now
+   zshiny article-find-by-filter --filter-value color:red
+   zshiny article-get IQ142B008-G11
+   zshiny article-get IQ142B008-G11  --machine-readable
+   # show json schema:
+   zshiny article-show-schema
 
 - filters (article-filters)
 
