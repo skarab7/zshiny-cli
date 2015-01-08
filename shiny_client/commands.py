@@ -2,6 +2,7 @@ import base_client
 import category
 import article
 import article_filter
+import brand
 
 
 def add_command(cls):
@@ -32,3 +33,9 @@ for art_filter in [article_filter.FilterGetOneCommand,
                    article_filter.FilterShowSchemaCommand,
                    article_filter.FilterGetOneCommand]:
     add_command(art_filter)
+
+for b_cmd in [brand.BrandGetOneCommand,
+              brand.BrandShowSchemaCommand,
+              brand.BrandStatsCommand,
+              brand.BrandListCommand]:
+    add_command(b_cmd)

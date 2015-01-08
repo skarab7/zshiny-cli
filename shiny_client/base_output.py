@@ -106,7 +106,6 @@ def print_machine_readable_stats(stats):
 def get_print_pretty_table_stats(stats):
     # list is necessary, because keys are set-alike view
     keys = sorted(list(stats.keys()))
-    print(keys)
     x = PrettyTable(keys)
 
     row = []

@@ -1,12 +1,10 @@
 ZShiny - Unofficial zalando API CLI 
 =====================================
 
-Warning - IN DEVELOPMENT. Holiday project :)
-
 Supported functionality
 ----------------------------
 
-- Exposed functionality in CLI:
+Exposed functionality in CLI:
 
  - catalog:
   
@@ -40,11 +38,14 @@ Supported functionality
       zshiny filter-show-schema --machine-readable
 
 
-- brand
-  
-  IN PROGRESS
+- brand:
 
+   .. code:: bash
 
+      zshiny brand-get <BRAND_KEY> 
+      zshiny brand-show-schema 
+      zshiny brand-stats        # stats of brand resource
+      zshiny brand-list         # list all brands
 
 Use case
 -----------
