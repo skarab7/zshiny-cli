@@ -36,6 +36,33 @@ class ArticleGetOneCommand(base_client.CommandBasicProperties, object):
         base_output.print_item(parsed_args, item, self._fields)
 
 
+class ArticleFullTextSearchCommand(base_client.CommandBasicProperties, object):
+    """
+    """
+    def __init__(self):
+        super(ArticleFullTextSearchCommand, self).__init__(
+            "article-search",
+            "full-text search for articles",
+            "articles",
+            ARTICLE_DEFAULT_FIELDS)
+
+    def add_parser_args(self, parser):
+        """
+        """
+        parser.add_argument(self.command_name, action="store",
+                            help=self.help_info)
+
+    def perform(self, parsed_args):
+        text_query = getattr(parsed_args, self.command_name)
+
+        cm = base.create_resource_mgmt(ArticleManager, self.endpoint, self.lang, self.is_insecure,
+                                       False)
+        base_output.print_list(parsed_args, cm.search(text_query), self._fields)
+
+    def _print_list(self, parsed_args, items):
+        base_output.print_list(parsed_args, items, self._fields)
+
+
 class ArticleFindByFilterCommand(base_client.CommandBasicProperties, object):
     """
     """

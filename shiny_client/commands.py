@@ -16,7 +16,8 @@ for art_cmd in [article.ArticleListCommand,
                 article.ArticleStatsCommand,
                 article.ArticleFindByFilterCommand,
                 article.ArticleGetOneCommand,
-                article.ArticleShowSchemaCommand]:
+                article.ArticleShowSchemaCommand,
+                article.ArticleFullTextSearchCommand]:
     add_command(art_cmd)
 
 
