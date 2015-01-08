@@ -25,6 +25,11 @@ Exposed functionality in CLI (see `Official Zalando Shop API <https://github.com
 
     zshiny article-list
     zshiny article-list --fields name season modelId
+    # support for sorting
+    zshiny article-list --sort-by-popularity
+    # full-text search
+    zshiny article-search shoe --machine-readable
+    # use filters
     zshiny article-find-by-filter --filter-value color:red
     zshiny article-get <ARTICLE_ID>
     zshiny article-get <ARTICLE_ID>  --machine-readable

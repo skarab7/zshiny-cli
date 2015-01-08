@@ -5,6 +5,22 @@ from shiny_client import base_output
 ARTICLE_DEFAULT_FIELDS = ["name", "id", "model-id", "color", "genders"]
 
 
+def add_support_for_sorting(parser):
+    for so in ArticleManager.get_sort_options():
+        parser.add_argument("--sort-by-" + so["name"], action="store_true", help=so["help_info"])
+
+
+def add_soring_args_to_params(args, params):
+    param_name = ArticleManager.get_sort_param()
+
+    for so in ArticleManager.get_sort_options():
+        attr_name = "sort_by_" + so["name"].replace("-", "_")
+        v = getattr(args, attr_name)
+        if v:
+            params[param_name] = so["name"]
+            break
+
+
 class ArticleGetOneCommand(base_client.CommandBasicProperties, object):
     """
     """
@@ -51,13 +67,17 @@ class ArticleFullTextSearchCommand(base_client.CommandBasicProperties, object):
         """
         parser.add_argument(self.command_name, action="store",
                             help=self.help_info)
+        add_support_for_sorting(parser)
 
     def perform(self, parsed_args):
         text_query = getattr(parsed_args, self.command_name)
 
+        params = {}
+        add_soring_args_to_params(parsed_args, params)
+
         cm = base.create_resource_mgmt(ArticleManager, self.endpoint, self.lang, self.is_insecure,
                                        False)
-        base_output.print_list(parsed_args, cm.search(text_query), self._fields)
+        base_output.print_list(parsed_args, cm.search(text_query, params), self._fields)
 
     def _print_list(self, parsed_args, items):
         base_output.print_list(parsed_args, items, self._fields)
@@ -83,6 +103,7 @@ class ArticleFindByFilterCommand(base_client.CommandBasicProperties, object):
                             help="""A list of <filter name : filter value> separated by space. \
 Check the available filter names and possible values with \
 article filter-list command.""")
+        add_support_for_sorting(parser)
 
     def perform(self, parsed_args):
         find_by_filter = {}
@@ -93,6 +114,9 @@ article filter-list command.""")
             if fn not in find_by_filter:
                 find_by_filter[fn] = []
             find_by_filter[fn].append(fv)
+
+        add_soring_args_to_params(parsed_args, find_by_filter)
+
         cm = base.create_resource_mgmt(ArticleManager, self.endpoint, self.lang, self.is_insecure,
                                        False)
 
@@ -161,15 +185,16 @@ class ArticleListCommand(base_client.CommandBasicProperties, object):
         """
         parser.add_argument(self.command_name, action="store_true",
                             help=self.help_info)
+        add_support_for_sorting(parser)
 
     def perform(self, parsed_args):
         """
         """
-        print(self.endpoint)
+        params = {}
+        add_soring_args_to_params(parsed_args, params)
         cm = base.create_resource_mgmt(ArticleManager, self.endpoint, self.lang, self.is_insecure,
                                        False)
-
-        self._print_list(parsed_args, cm.list())
+        self._print_list(parsed_args, cm.list(params))
 
     def _print_list(self, parsed_args, items):
         base_output.print_list(parsed_args, items, self._fields)
@@ -186,23 +211,26 @@ class ArticleManager (base.ApiResource, object):
     def _to_domain_object(self, json):
         return Article(json)
 
-    def search(self, string_query):
-        return self.find_by({"fullText": string_query})
+    def search(self, string_query, params={}):
+        params["fullText"] = string_query
+        return self.find_by(params)
 
-    def get_sort_options(self):
+    @staticmethod
+    def get_sort_options():
         """
         The description from:
         https://github.com/zalando/shop-api-documentation/wiki/Articles#sorting
         In the next version, the options could be extracted from docs (not very good but handy).
         Maybe, zalando will provide a REST where you can get all the sorting options.
         """
-        return {"popularity": "sort by popularity (default)",
-                "activationDate": "sort articles by their activation date",
-                "priceDesc": "expensive articles comes first",
-                "priceAsc": "cheaper articles comes first",
-                "sale":  "articles on sale comes first"}
+        return [{"name": "popularity", "help_info": "sort by popularity (default)"},
+                {"name": "activationDate", "help_info": "sort articles by their activation date"},
+                {"name": "priceDesc", "help_info": "expensive articles comes first"},
+                {"name": "priceAsc", "help_info": "cheaper articles comes first"},
+                {"name": "sale", "help_info": "articles on sale comes first"}]
 
-    def get_sort_param(self):
+    @staticmethod
+    def get_sort_param():
         return "sort"
 
     @staticmethod
