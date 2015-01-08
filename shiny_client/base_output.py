@@ -20,6 +20,14 @@ def print_machine_readable_item(item, output_fields):
         print(",".join(row))
 
 
+def _sort_the_attrs(func):
+    def func_wrapper(*args, **kwargs):
+        r = func(*args, **kwargs)
+        return sorted(list(r))
+    return func_wrapper
+
+
+@_sort_the_attrs
 def _filter_attributes(attrs, output_fields):
     return [attr for attr in attrs
             if _should_attr_be_printed(output_fields, attr)]
