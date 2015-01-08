@@ -8,7 +8,7 @@ Supported functionality
 
 - Exposed functionality in CLI:
 
- - list categories for all the articles:
+ - catalog:
   
  ::
 
@@ -16,8 +16,27 @@ Supported functionality
    zshiny catalog-find --find-by-name shoe
    zshiny catalog-get <CATALOG_ID>
    zshiny catalog-get <CATALOG_ID> --machine-readable
-   # show json schema of catalog
+   # show json schema of catalog:
    zshiny catalog-show-schema 
+
+- article:
+  
+  zshiny article-list
+  # simple single values supported now
+  zshiny article-find-by-filter --filter-value color:red
+  zshiny article-get IQ142B008-G11
+  zshiny article-get IQ142B008-G11  --machine-readable
+  # show json schema:
+  zshiny article-show-schema
+
+- filters (article-filters)
+
+  IN PROGRESS
+
+- brand
+  
+  IN PROGRESS
+
 
 
 Use case
