@@ -1,10 +1,10 @@
-ZShiny - Unofficial zalando API CLI 
-=====================================
+ZShiny - Unofficial Zalando Shop API CLI 
+============================================
 
 Supported functionality
 ----------------------------
 
-Exposed functionality in CLI:
+Exposed functionality in CLI (see `Official Zalando Shop API <https://github.com/zalando/shop-api-documentation/wiki/Api-introduction>`_):
 
 - catalog:
   
@@ -12,28 +12,33 @@ Exposed functionality in CLI:
 
     zshiny catalog-list
     zshiny catalog-find --find-by-name shoe
-    zshiny catalog-get <CATALOG_ID>
-    zshiny catalog-get <CATALOG_ID> --machine-readable
+    zshiny catalog-get <CATALOG_KEY>
+    zshiny catalog-get <CATALOG_KEY> --machine-readable
     # show json schema of catalog:
     zshiny catalog-show-schema 
+    # get size of the resource:
+    zshiny catalog-stats
 
 - article:
   
   .. code:: bash
 
     zshiny article-list
+    zshiny article-list --fields name season modelId
     zshiny article-find-by-filter --filter-value color:red
-    zshiny article-get IQ142B008-G11
-    zshiny article-get IQ142B008-G11  --machine-readable
+    zshiny article-get <ARTICLE_ID>
+    zshiny article-get <ARTICLE_ID>  --machine-readable
     # show json schema:
     zshiny article-show-schema
+    # get size of the resource:
+    zshiny article-stats
 
 - filters (article-filters)
 
   .. code:: bash
 
     zshiny filter-list
-    zshiny filter-get activationDate
+    zshiny filter-get <FILTER_NAME>
     zshiny filter-show-schema --machine-readable
 
 
