@@ -10,30 +10,35 @@ Supported functionality
 
  - catalog:
   
- ::
+   .. code:: bash
 
-   zshiny catalog-list
-   zshiny catalog-find --find-by-name shoe
-   zshiny catalog-get <CATALOG_ID>
-   zshiny catalog-get <CATALOG_ID> --machine-readable
-   # show json schema of catalog:
-   zshiny catalog-show-schema 
+     zshiny catalog-list
+     zshiny catalog-find --find-by-name shoe
+     zshiny catalog-get <CATALOG_ID>
+     zshiny catalog-get <CATALOG_ID> --machine-readable
+     # show json schema of catalog:
+     zshiny catalog-show-schema 
 
 - article:
   
- ::
+   .. code:: bash
 
-   zshiny article-list
-   # simple single values supported now
-   zshiny article-find-by-filter --filter-value color:red
-   zshiny article-get IQ142B008-G11
-   zshiny article-get IQ142B008-G11  --machine-readable
-   # show json schema:
-   zshiny article-show-schema
+      zshiny article-list
+      # simple single values supported now
+      zshiny article-find-by-filter --filter-value color:red
+      zshiny article-get IQ142B008-G11
+      zshiny article-get IQ142B008-G11  --machine-readable
+      # show json schema:
+      zshiny article-show-schema
 
 - filters (article-filters)
 
-  IN PROGRESS
+   .. code:: bash
+
+      zshiny filter-list
+      zshiny filter-get activationDate
+      zshiny filter-show-schema --machine-readable
+
 
 - brand
   
@@ -51,13 +56,12 @@ She/he can not live without showing off his bash/(any other tool) skills :D. The
 supports *--machine-readable*, so the output of CLI may be feed to any tool of her/his choice. Because, the gift-finding is an  iterative process, the CLI *MUST* be responsive and --- if necessary pre-fetch data.
 
 
-:: 
+.. code:: bash
 
 	# show me all brands (example with the only polish brand I know ;) )
 	zshiny brand-list | grep evaminge 
 
-	zshiny brand-get --id=ev2
-	zshiny brand-get --name=evaminge
+	zshiny brand-get <BRAND_ID>
 
 	# we could use here brand-find as well
 	export MY_BRAND_ID=$(zshiny brand-list --machine-readable | grep evaminge)
