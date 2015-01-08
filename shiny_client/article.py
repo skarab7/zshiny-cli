@@ -42,7 +42,7 @@ class ArticleFindByFilterCommand(base_client.CommandBasicProperties, object):
     """
     def __init__(self):
         super(ArticleFindByFilterCommand, self).__init__("article-find-by-filter",
-                                                         "find using article filters",
+                                                         "find using article filters (check: article filter-list).",
                                                          "articles",
                                                          ARTICLE_DEFAULT_FIELDS)
 

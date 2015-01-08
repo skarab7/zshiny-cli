@@ -5,18 +5,17 @@ from shiny_client import base_client
 from shiny_client.base import create_resource_mgmt
 from shiny_client import commands
 from shiny_client.discovery_service import ResourceEndpointManager
+from collections import OrderedDict
 
 ZALANDO_ENDPOINT = os.environ.get("ZALANDO_API_ENDPOINT",
                                   "https://api.zalando.com")
-
-ARTICLE_ENDPOINT = "https://api.zalando.com/articles"
 
 
 class Cli(object):
 
     def __init__(self):
         self.parser = argparse.ArgumentParser(description='')
-        self.clients = dict()
+        self.clients = OrderedDict()
 
     def add_enabled_commands(self, resource_clients):
         self._discover_enabled_commands(resource_clients)
