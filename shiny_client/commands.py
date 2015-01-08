@@ -9,8 +9,17 @@ def add_command(cls):
 
 enabled_commands = []
 
-add_command(category.CategoryListCommand)
-add_command(category.CategoryShowSchemaCommand)
-add_command(category.CategoryGetOneCommand)
-add_command(category.CategoryFindByCommand)
-add_command(category.CategoryStatsCommand)
+for cat_cmd in [category.CategoryListCommand,
+                category.CategoryShowSchemaCommand,
+                category.CategoryGetOneCommand,
+                category.CategoryFindByCommand,
+                category.CategoryStatsCommand]:
+    add_command(cat_cmd)
+
+
+for art_cmd in [article.ArticleListCommand,
+                article.ArticleStatsCommand,
+                article.ArticleFindByFilterCommand,
+                article.ArticleGetOneCommand,
+                article.ArticleShowSchemaCommand]:
+    add_command(art_cmd)

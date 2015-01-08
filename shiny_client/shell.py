@@ -9,6 +9,8 @@ from shiny_client.discovery_service import ResourceEndpointManager
 ZALANDO_ENDPOINT = os.environ.get("ZALANDO_API_ENDPOINT",
                                   "https://api.zalando.com")
 
+ARTICLE_ENDPOINT = "https://api.zalando.com/articles"
+
 
 class Cli(object):
 

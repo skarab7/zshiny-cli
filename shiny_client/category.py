@@ -1,7 +1,5 @@
-import requests
 from shiny_client import base
 from shiny_client import base_client
-from prettytable import PrettyTable
 from shiny_client import base_output
 
 CATEGORY_DEFAULT_FIELDS = ["key", "name", "type", "outlet"]
@@ -165,11 +163,16 @@ class CategoryManager(base.ApiResource, object):
           - the type
         """
 
-        filter_fields = [{"name":"name", "type": "string", "help_info":"Filters categories by its name containing the given string (ignoring case)"},
-                         {"name":"type", "type":"string", "help_info":"Filters categories by its type containing the given string (ignoring case)"},
-                         {"name":"outlet", "type":"boolean", "help_info":"Filters outlet categories"},
-                         {"name":"hidden", "type": "boolean", "help_info":"Filters hidden categories"},
-                         {"name":"targetGroup", "type": "enum", "help_info":"Filters categories matching the given tragetGroup (all, women, men, kids)"}]
+        filter_fields = [
+            {"name": "name", "type": "string",
+             "help_info": """Filters categories by its name containing the given string (ignoring case)"""},
+            {"name": "type", "type": "string",
+             "help_info": """Filters categories by its type containing the given string (ignoring case)"""},
+            {"name": "outlet", "type": "boolean", "help_info": "Filters outlet categories"},
+            {"name": "hidden", "type": "boolean", "help_info": "Filters hidden categories"},
+            {"name": "targetGroup", "type": "enum",
+             "help_info": "Filters categories matching the given tragetGroup (all, women, men, kids)"}
+        ]
         return filter_fields
 
     @staticmethod

@@ -1,4 +1,151 @@
 from shiny_client import base
+from shiny_client import base_client
+from shiny_client import base_output
+from shiny_client import article_filter
+
+ARTICLE_DEFAULT_FIELDS = ["name", "id", "model-id", "color", "genders"]
+
+
+class ArticleGetOneCommand(base_client.CommandBasicProperties, object):
+    """
+    """
+    def __init__(self):
+        super(ArticleGetOneCommand, self).__init__("article-get",
+                                                   "get a article entry",
+                                                   "articles",
+                                                   ARTICLE_DEFAULT_FIELDS)
+
+    def add_parser_args(self, parser):
+        """
+        """
+        parser.add_argument(self.command_name, action="store",
+                            help=self.help_info)
+
+    def perform(self, parsed_args):
+        unique_id = getattr(parsed_args, self.command_name)
+
+        cm = base.create_resource_mgmt(ArticleManager, self.endpoint, self.lang, self.is_insecure,
+                                       False)
+
+        item = cm.get(unique_id)
+        self._print_item(parsed_args, item)
+
+    def _print_item(self, parsed_args, item):
+        """
+        A separated function that can be overwritten in the tests to not print out
+        """
+        base_output.print_item(parsed_args, item, self._fields)
+
+
+class ArticleFindByFilterCommand(base_client.CommandBasicProperties, object):
+    """
+    """
+    def __init__(self):
+        super(ArticleFindByFilterCommand, self).__init__("article-find-by-filter",
+                                                         "find using article filters",
+                                                         "articles",
+                                                         ARTICLE_DEFAULT_FIELDS)
+
+    def add_parser_args(self, parser):
+        """
+        """
+        parser.add_argument(self.command_name, action="store_true",
+                            help=self.help_info)
+
+        parser.add_argument("--filter-values", action="store", nargs='+',
+                            help="""A list of <filter name : filter value> separated by comma. \
+Check the available filter names and possible values with \
+article filter-list command.""")
+
+    def perform(self, parsed_args):
+        print(parsed_args)
+
+        find_by_filter = {}
+        for fv in parsed_args.filter_values:
+            separator_pos = fv.find(":")
+            fn = fv[0:separator_pos]
+            fv = fv[separator_pos + 1:]
+            find_by_filter[fn] = fv
+        cm = base.create_resource_mgmt(ArticleManager, self.endpoint, self.lang, self.is_insecure,
+                                       False)
+
+        base_output.print_list(parsed_args, cm.find_by(find_by_filter), self._fields)
+
+    def _print_list(self, parsed_args, items):
+        base_output.print_list(parsed_args, items, self._fields)
+
+
+class ArticleShowSchemaCommand(base_client.CommandBasicProperties, object):
+    """
+    """
+
+    def __init__(self):
+        super(ArticleShowSchemaCommand, self).__init__("article-show-schema",
+                                                       "show article entry schema",
+                                                       "articles",
+                                                       ARTICLE_DEFAULT_FIELDS)
+
+    def add_parser_args(self, parser):
+        """
+        """
+        parser.add_argument(self.command_name, action="store_true",
+                            help=self.help_info)
+
+    def perform(self, parsed_args):
+        output = base_output.get_pretty_json(ArticleManager.get_schema())
+        print(output)
+
+
+class ArticleStatsCommand(base_client.CommandBasicProperties, object):
+
+    def __init__(self):
+        super(ArticleStatsCommand, self).__init__("article-stats",
+                                                  "stats of article resource",
+                                                  "articles",
+                                                  ["totalElements"])
+
+    def add_parser_args(self, parser):
+        """
+        """
+        parser.add_argument(self.command_name, action="store_true",
+                            help=self.help_info)
+
+    def perform(self, parsed_args):
+        """
+        """
+        cm = base.create_resource_mgmt(ArticleManager, self.endpoint, self.lang, self.is_insecure,
+                                       False)
+        printed_stats = dict((k, v) for k, v in cm.get_stats().items() if k in self._fields)
+
+        base_output.print_stats(parsed_args, printed_stats)
+
+
+class ArticleListCommand(base_client.CommandBasicProperties, object):
+    """
+    """
+    def __init__(self):
+        super(ArticleListCommand, self).__init__("article-list",
+                                                 "list all articles",
+                                                 "articles",
+                                                 ARTICLE_DEFAULT_FIELDS)
+
+    def add_parser_args(self, parser):
+        """
+        """
+        parser.add_argument(self.command_name, action="store_true",
+                            help=self.help_info)
+
+    def perform(self, parsed_args):
+        """
+        """
+        print(self.endpoint)
+        cm = base.create_resource_mgmt(ArticleManager, self.endpoint, self.lang, self.is_insecure,
+                                       False)
+
+        self._print_list(parsed_args, cm.list())
+
+    def _print_list(self, parsed_args, items):
+        base_output.print_list(parsed_args, items, self._fields)
 
 
 class ArticleManager (base.ApiResource, object):
@@ -7,7 +154,7 @@ class ArticleManager (base.ApiResource, object):
     def __init__(self):
         """
         """
-        self._page_size = 40
+        self._page_size = 200
 
     def _to_domain_object(self, json):
         return Article(json)
@@ -31,7 +178,8 @@ class ArticleManager (base.ApiResource, object):
     def get_sort_param(self):
         return "sort"
 
-    def get_schema(self):
+    @staticmethod
+    def get_schema():
         """
         The properties dsc were
         taken from Zalando official API docs
