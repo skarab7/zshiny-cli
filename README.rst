@@ -22,7 +22,6 @@ Exposed functionality in CLI:
   .. code:: bash
 
     zshiny article-list
-    # simple single values supported now
     zshiny article-find-by-filter --filter-value color:red
     zshiny article-get IQ142B008-G11
     zshiny article-get IQ142B008-G11  --machine-readable
