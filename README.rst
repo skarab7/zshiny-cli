@@ -58,6 +58,19 @@ Exposed functionality in CLI (see `Official Zalando Shop API <https://github.com
     zshiny brand-stats        # stats of brand resource
     zshiny brand-list         # list all brands
 
+How to install
+--------------------
+
+.. code:: bash
+ 
+  git clone https://github.com/skarab7/zshiny-cli.git
+  cd zshiny-cli
+  python setup.py install 
+
+  zshiny -h
+  # uninstall with: pip3 uninstall zshiny_client
+
+
 Use case
 -----------
 
