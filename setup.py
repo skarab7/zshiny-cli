@@ -21,10 +21,10 @@ config = {
     'install_requires': read('requirements.txt'),
     'scripts': [],
     'packages': ['shiny_client'],
-    'name': 'shiny_client',
+    'name': 'zshiny_client',
     'entry_points': {
         'console_scripts': [
-            'zshiny = shiny_client.client:main'
+            'zshiny = shiny_client.shell:main'
         ]
     },
     'keywords': "zalando API REST commandline cli"
