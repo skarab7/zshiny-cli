@@ -22,6 +22,7 @@ class TestCategoryListCommand(unittest.TestCase):
         c.is_insecure = False
         parsed_args = lambda: None
         parsed_args.fields = ['name', 'key', 'type', 'parentKey']
+        parsed_args.is_machine_readable = True
         c.perform(parsed_args)
 
     def test_show_schema(self):
