@@ -121,7 +121,7 @@ class FilterManager(base.SimpleApiResource):
 
     @staticmethod
     def get_filter_types():
-        return ["enum", "key", "range", "string"]
+        return ["enum", "key", "range", "string", "sku"]
 
 
 class ArticleFilter(base.ApiObject, object):
