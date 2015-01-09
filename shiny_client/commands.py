@@ -1,8 +1,8 @@
-import base_client
-import category
-import article
-import article_filter
-import brand
+from shiny_client import base_client
+from shiny_client import category
+from shiny_client import article
+from shiny_client import article_filter
+from shiny_client import brand
 
 
 def add_command(cls):
