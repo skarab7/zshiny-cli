@@ -31,6 +31,8 @@ Exposed functionality in CLI (see `Official Zalando Shop API <https://github.com
     zshiny article-search shoe --machine-readable
     # use filters
     zshiny article-find-by-filter --filter-value color:red
+    # use multi-value filters
+    zshiny article-find-by-filter --filter-value color:red color:white --machine-readable
     zshiny article-get <ARTICLE_ID>
     zshiny article-get <ARTICLE_ID>  --machine-readable
     # show json schema:
