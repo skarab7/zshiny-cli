@@ -6,9 +6,7 @@ MAINTAINER Wojciech Barczynski (github:skarab7)
 
 ENV ZALANDO_API_ENDPOINT, https://api.zalando.com
 
-RUN apt-get -y update && apt-get install -y python3-pip \
-                                            python3-virtualenv
-RUN pip3 install virtualenvwrapper
+RUN apt-get -y update && apt-get install -y python3-pip
 
 ADD requirements.txt /home/
 ADD test-requirements.txt /home/

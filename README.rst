@@ -61,6 +61,9 @@ Exposed functionality in CLI (see `Official Zalando Shop API <https://github.com
 How to install
 --------------------
 
+On Your machine
+~~~~~~~~~~~~~~~~~~~
+
 .. code:: bash
  
   git clone https://github.com/skarab7/zshiny-cli.git
@@ -69,6 +72,21 @@ How to install
 
   zshiny -h
   # uninstall with: pip3 uninstall zshiny_client
+
+Docker
+~~~~~~~~~~~~~
+
+.. code:: bash
+
+  git clone https://github.com/skarab7/zshiny-cli.git
+  cd zshiny-cli
+  
+  make docker_build
+  # print the help
+  docker run -it --rm zshiny_cli_box -h
+
+  # get a list of brands
+  docker run -it --rm zshiny_cli_box brand-list
 
 
 Use case
