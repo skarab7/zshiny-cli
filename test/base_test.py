@@ -6,14 +6,20 @@ import requests
 
 class BaseResourceTest:
 
-    def get_api_lang(self):
-        return os.getenv("SHINY_CLIENT_TEST_API_LANG", "pl-PL")
+    @staticmethod
+    def get_api_lang():
+        return os.getenv("ZSHINY_CLIENT_TEST_API_LANG", "pl-PL")
 
     def _get_resource_mgmt(self):
         mgmt = self._create_resource_mgmt()
         mgmt.resource_url = self._get_resource_endpoint()
         mgmt.api_lang = self.get_api_lang()
+        mgmt.request_timeout = self.get_timeout()
         return mgmt
+
+    @staticmethod
+    def get_timeout():
+        return os.getenv("ZSHINY_CLIENT_TEST_REQ_TIMEOUT", 2)
 
     def test_integration_with_api(self):
         mgmt = self._get_resource_mgmt()
@@ -23,6 +29,10 @@ class BaseResourceTest:
             js = mgmt.get_schema()
             json_schema = json.loads(js)
             jsonschema.validate(object_as_json, json_schema)
+
+    @staticmethod
+    def is_insecure():
+        return os.getenv("ZSHINY_CLIENT_TEST_INSECURE", False)
 
 
 class SimpleApiResourceTest(BaseResourceTest):

@@ -39,9 +39,7 @@ class ArticleGetOneCommand(base_client.CommandBasicProperties, object):
     def perform(self, parsed_args):
         unique_id = getattr(parsed_args, self.command_name)
 
-        cm = base.create_resource_mgmt(ArticleManager, self.endpoint, self.lang, self.is_insecure,
-                                       False)
-
+        cm = base_client.create_resource_mgmt(self, ArticleManager)
         item = cm.get(unique_id)
         self._print_item(parsed_args, item)
 
@@ -75,8 +73,8 @@ class ArticleFullTextSearchCommand(base_client.CommandBasicProperties, object):
         params = {}
         add_soring_args_to_params(parsed_args, params)
 
-        cm = base.create_resource_mgmt(ArticleManager, self.endpoint, self.lang, self.is_insecure,
-                                       False)
+        cm = base_client.create_resource_mgmt(self, ArticleManager)
+
         base_output.print_list(parsed_args, cm.search(text_query, params), self._fields)
 
     def _print_list(self, parsed_args, items):
@@ -117,8 +115,7 @@ article filter-list command.""")
 
         add_soring_args_to_params(parsed_args, find_by_filter)
 
-        cm = base.create_resource_mgmt(ArticleManager, self.endpoint, self.lang, self.is_insecure,
-                                       False)
+        cm = base_client.create_resource_mgmt(self, ArticleManager)
 
         base_output.print_list(parsed_args, cm.find_by(find_by_filter), self._fields)
 
@@ -164,8 +161,8 @@ class ArticleStatsCommand(base_client.CommandBasicProperties, object):
     def perform(self, parsed_args):
         """
         """
-        cm = base.create_resource_mgmt(ArticleManager, self.endpoint, self.lang, self.is_insecure,
-                                       False)
+        cm = base_client.create_resource_mgmt(self, ArticleManager)
+
         printed_stats = dict((k, v) for k, v in cm.get_stats().items() if k in self._fields)
 
         base_output.print_stats(parsed_args, printed_stats)
@@ -192,8 +189,8 @@ class ArticleListCommand(base_client.CommandBasicProperties, object):
         """
         params = {}
         add_soring_args_to_params(parsed_args, params)
-        cm = base.create_resource_mgmt(ArticleManager, self.endpoint, self.lang, self.is_insecure,
-                                       False)
+        cm = base_client.create_resource_mgmt(self, ArticleManager)
+
         self._print_list(parsed_args, cm.list(params))
 
     def _print_list(self, parsed_args, items):

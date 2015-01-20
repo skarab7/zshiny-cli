@@ -24,9 +24,7 @@ class BrandGetOneCommand(base_client.CommandBasicProperties, object):
     def perform(self, parsed_args):
         unique_id = getattr(parsed_args, self.command_name)
 
-        cm = base.create_resource_mgmt(BrandManager, self.endpoint, self.lang,
-                                       self.is_insecure,
-                                       False)
+        cm = base_client.create_resource_mgmt(self, BrandManager)
 
         item = cm.get(unique_id)
         self._print_item(parsed_args, item)
@@ -76,8 +74,8 @@ class BrandStatsCommand(base_client.CommandBasicProperties, object):
     def perform(self, parsed_args):
         """
         """
-        cm = base.create_resource_mgmt(BrandManager, self.endpoint, self.lang, self.is_insecure,
-                                       False)
+        cm = base_client.create_resource_mgmt(self, BrandManager)
+
         printed_stats = dict((k, v) for k, v in cm.get_stats().items() if k in self._fields)
 
         base_output.print_stats(parsed_args, printed_stats)
@@ -101,8 +99,7 @@ class BrandListCommand(base_client.CommandBasicProperties, object):
     def perform(self, parsed_args):
         """
         """
-        cm = base.create_resource_mgmt(BrandManager, self.endpoint, self.lang, self.is_insecure,
-                                       False)
+        cm = base_client.create_resource_mgmt(self, BrandManager)
 
         self._print_list(parsed_args, cm.list())
 

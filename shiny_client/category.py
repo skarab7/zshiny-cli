@@ -23,8 +23,7 @@ class CategoryGetOneCommand(base_client.CommandBasicProperties, object):
     def perform(self, parsed_args):
         unique_id = getattr(parsed_args, self.command_name)
 
-        cm = base.create_resource_mgmt(CategoryManager, self.endpoint, self.lang, self.is_insecure,
-                                       False)
+        cm = base_client.create_resource_mgmt(self, CategoryManager)
 
         item = cm.get(unique_id)
         self._print_item(parsed_args, item)
@@ -61,9 +60,7 @@ class CategoryFindByCommand(base_client.CommandBasicProperties, object):
             if v is not None:
                 find_by_fields[f_name] = v
 
-        cm = base.create_resource_mgmt(CategoryManager, self.endpoint, self.lang, self.is_insecure,
-                                       False)
-
+        cm = base_client.create_resource_mgmt(self, CategoryManager)
         self._print_list(parsed_args, cm.find_by(find_by_fields))
 
     def _print_list(self, parsed_args, items):
@@ -108,8 +105,8 @@ class CategoryStatsCommand(base_client.CommandBasicProperties, object):
     def perform(self, parsed_args):
         """
         """
-        cm = base.create_resource_mgmt(CategoryManager, self.endpoint, self.lang, self.is_insecure,
-                                       False)
+        cm = base_client.create_resource_mgmt(self, CategoryManager)
+
         printed_stats = dict((k, v) for k, v in cm.get_stats().items() if k in self._fields)
 
         base_output.print_stats(parsed_args, printed_stats)
@@ -133,8 +130,7 @@ class CategoryListCommand(base_client.CommandBasicProperties, object):
     def perform(self, parsed_args):
         """
         """
-        cm = base.create_resource_mgmt(CategoryManager, self.endpoint, self.lang, self.is_insecure,
-                                       False)
+        cm = base_client.create_resource_mgmt(self, CategoryManager)
 
         self._print_list(parsed_args, cm.list())
 
