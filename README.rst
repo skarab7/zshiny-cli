@@ -11,6 +11,7 @@ Exposed functionality in CLI (see `Official Zalando Shop API <https://github.com
   .. code:: bash
 
     zshiny catalog-list
+    zshiny catalog-list --timeout 2
     zshiny catalog-find --find-by-name shoe
     zshiny catalog-get <CATALOG_KEY>
     zshiny catalog-get <CATALOG_KEY> --machine-readable
