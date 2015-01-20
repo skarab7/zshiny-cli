@@ -14,6 +14,13 @@ def create_resource_mgmt(cls, endpoint, lang, timeout, is_insecure, is_debug_ena
     return mgmt
 
 
+def raise_error_on_req_status(r):
+    if r.status_code == requests.codes.ok:
+        return r
+    else:
+        r.raise_for_status()
+
+
 class BaseApiResource(object):
     """
     """
@@ -47,10 +54,8 @@ class BaseApiResource(object):
     def _request_raise_for_status(func):
         def func_wrapper(*args, **kwargs):
                 r = func(*args, **kwargs)
-                if r.status_code == requests.codes.ok:
-                    return r
-                else:
-                    r.raise_for_status()
+                return raise_error_on_req_status(r)
+
         return func_wrapper
 
     @_request_raise_for_status
@@ -146,6 +151,7 @@ class ApiResource(BaseApiResource):
             f_r = future_reqs[idx_current_req]
             if f_r:
                 r = f_r.result()
+                raise_error_on_req_status(r)
                 rj = r.json()
                 cs = rj["content"]
                 for c in cs:
@@ -164,6 +170,7 @@ class ApiResource(BaseApiResource):
             f_r = future_reqs[idx_current_req]
             if f_r:
                 r = f_r.result()
+                raise_error_on_req_status(r)
                 rj = r.json()
                 cs = rj["content"]
                 for c in cs:
