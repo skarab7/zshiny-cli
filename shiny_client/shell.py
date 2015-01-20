@@ -10,6 +10,8 @@ from collections import OrderedDict
 ZALANDO_ENDPOINT = os.environ.get("ZALANDO_API_ENDPOINT",
                                   "https://api.zalando.com")
 
+DEF_REQUEST_TIMEOUT_SEC = 2
+
 
 class Cli(object):
 
@@ -76,6 +78,13 @@ in different countries")
         subparser.add_argument('--fields', action='store', dest="output_fields", nargs='+',
                                help="You can select attributes or ALL", default=None)
 
+        timeout_help = "Timeout for http requests, default: {0} seconds".format(
+                       DEF_REQUEST_TIMEOUT_SEC)
+        subparser.add_argument('--timeout', action='store', dest="timeout",
+                               type=int,
+                               help=timeout_help,
+                               default=DEF_REQUEST_TIMEOUT_SEC)
+
     def parse_args(self):
         """
         Parse arguments
@@ -93,6 +102,7 @@ in different countries")
         cmd.lang = self._args.lang
         cmd.endpoint = get_resource_url(cmd, resource_catalog)
         cmd.is_insecure = False
+        cmd.request_timeout = self._args.timeout
         if self._args.output_fields:
             cmd.fields = self._args.output_fields
         return cmd.perform(self._args)
@@ -105,6 +115,7 @@ def get_resource_url(cmd, resource_catalog):
 
 def get_resource_catalog(args):
     rm = create_resource_mgmt(ResourceEndpointManager, args.endpoint,
+                              args.timeout,
                               args.lang, args.is_insecure, args.is_debug_enabled)
     result = list(rm.list())[0]
     return result

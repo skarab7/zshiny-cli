@@ -16,14 +16,23 @@ class TestCategoryListCommand(unittest.TestCase):
         self.assertTrue(isinstance(category.CategoryListCommand(), base_client.PluginCommandBase))
 
     def test_get_list(self):
+        c = self._get_command()
+        parsed_args = self._get_mocked_args()
+        c.perform(parsed_args)
+
+    def _get_command(self):
         c = category.CategoryListCommand()
-        c.lang = "EN-en"
+        c.lang = ApiResourceTest.get_api_lang()
         c.endpoint = TestCategoryListCommand.RESOURCE_URL
-        c.is_insecure = False
+        c.is_insecure = ApiResourceTest.is_insecure()
+        c.request_timeout = ApiResourceTest.get_timeout()
+        return c
+
+    def _get_mocked_args(self):
         parsed_args = lambda: None
         parsed_args.fields = ['name', 'key', 'type', 'parentKey']
         parsed_args.is_machine_readable = True
-        c.perform(parsed_args)
+        return parsed_args
 
     def test_show_schema(self):
         c = category.CategoryListCommand()

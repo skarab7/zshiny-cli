@@ -4,10 +4,13 @@ from requests_futures.sessions import FuturesSession
 from concurrent.futures import ThreadPoolExecutor
 
 
-def create_resource_mgmt(cls, endpoint, lang, is_insecure, is_debug_enabled):
+def create_resource_mgmt(cls, endpoint, lang, timeout, is_insecure, is_debug_enabled):
     mgmt = cls()
+    mgmt.request_timeout = timeout
     mgmt.resource_url = endpoint
     mgmt.api_lang = lang
+    mgmt.is_insecure = is_insecure
+    mgmt.is_debug_enabled = is_debug_enabled
     return mgmt
 
 
@@ -30,6 +33,14 @@ class BaseApiResource(object):
     def api_lang(self, value):
         self._api_lang = value
 
+    @property
+    def request_timeout(self):
+        return self._request_timeout
+
+    @request_timeout.setter
+    def request_timeout(self, value):
+        self._request_timeout = value
+
     def _do_request(self, args):
         return self._do_request_url(self._resource_url, args)
 
@@ -45,7 +56,7 @@ class BaseApiResource(object):
     @_request_raise_for_status
     def _do_request_url(self, url, args={}):
         self._apply_lang(args)
-        r = requests.get(url, **args)
+        r = requests.get(url, timeout=self.request_timeout, **args)
         return r
 
     def _apply_lang(self, args):
@@ -175,7 +186,7 @@ class ApiResource(BaseApiResource):
     def _async_do_paged_request(self, session, page_num, params):
         args = self._get_paged_request_args(page_num, self._page_size, params)
         self._apply_lang(args)
-        return session.get(self._resource_url, **args)
+        return session.get(self._resource_url, timeout=self.request_timeout, **args)
 
     def _sync_do_paged_request(self, page_num, page_size, args={}):
         paged_args = self._get_paged_request_args(page_num, page_size, args)

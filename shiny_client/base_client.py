@@ -1,4 +1,5 @@
 import abc
+from shiny_client import base
 
 
 class PluginCommandBase(metaclass=abc.ABCMeta):
@@ -69,3 +70,20 @@ class CommandBasicProperties:
     @fields.setter
     def fields(self, value):
         self._fields = value
+
+    @property
+    def request_timeout(self):
+        return self._request_timeout
+
+    @request_timeout.setter
+    def request_timeout(self, value):
+        self._request_timeout = value
+
+
+def create_resource_mgmt(self, cls):
+    return base.create_resource_mgmt(cls,
+                                     self.endpoint,
+                                     self.lang,
+                                     self.request_timeout,
+                                     self.is_insecure,
+                                     False)

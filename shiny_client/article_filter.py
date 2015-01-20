@@ -24,8 +24,7 @@ class FilterGetOneCommand(base_client.CommandBasicProperties, object):
     def perform(self, parsed_args):
         unique_id = getattr(parsed_args, self.command_name)
 
-        cm = base.create_resource_mgmt(FilterManager, self.endpoint, self.lang, self.is_insecure,
-                                       False)
+        cm = base_client.create_resource_mgmt(self, FilterManager)
 
         items = (i for i in cm.list() if i.name == unique_id)
         items = list(items)
@@ -78,8 +77,7 @@ class FilterListCommand(base_client.CommandBasicProperties, object):
         """
         """
         print(self.endpoint)
-        cm = base.create_resource_mgmt(FilterManager, self.endpoint, self.lang, self.is_insecure,
-                                       False)
+        cm = base_client.create_resource_mgmt(self, FilterManager)
 
         self._print_list(parsed_args, cm.list())
 
